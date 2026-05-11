@@ -778,19 +778,18 @@ function TopBar({ geo, setGeo, horizon, setHorizon, sliders, setSliders, resetSl
                 return (
                   <div key={s.key} className={`slider-item ${isOpen ? 'slider-item-open' : ''}`}>
                     <div className="slider-item-head">
-                      <span className="slider-item-name">
-                        {s.name}
-                        {ref && (
-                          <button
-                            className={`slider-info-btn ${isOpen ? 'slider-info-btn-open' : ''}`}
-                            onClick={() => setOpenSlider(isOpen ? null : s.key)}
-                            aria-label={`${isOpen ? 'Hide' : 'Show'} details for ${s.name}`}
-                            title={isOpen ? 'Hide details' : 'Show description & references'}
-                          >
-                            {isOpen ? '×' : 'ⓘ'}
-                          </button>
-                        )}
-                      </span>
+                      <span className="slider-item-name">{s.name}</span>
+                      {ref && (
+                        <button
+                          type="button"
+                          className={`slider-info-btn ${isOpen ? 'slider-info-btn-open' : ''}`}
+                          onClick={() => setOpenSlider(isOpen ? null : s.key)}
+                          aria-label={(isOpen ? 'Hide' : 'Show') + ' details for ' + s.name}
+                          title={isOpen ? 'Hide details' : 'Show description & references'}
+                        >
+                          {isOpen ? '\u00d7' : '\u24d8'}
+                        </button>
+                      )}
                       <span className="slider-item-val">{sliders[s.key]}</span>
                     </div>
                     <input
@@ -1498,8 +1497,9 @@ const CSS = `
 
 .slider-item-head {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: baseline;
+  gap: 6px;
 }
 
 .slider-item-name {
@@ -1507,7 +1507,6 @@ const CSS = `
   font-size: 12px;
   font-weight: 500;
   color: var(--ink-2);
-  cursor: help;
 }
 
 .slider-item-val {
@@ -1515,7 +1514,7 @@ const CSS = `
   font-size: 12px;
   font-weight: 500;
   color: var(--accent);
-  min-width: 30px;
+  margin-left: auto;
   text-align: right;
 }
 
@@ -1547,12 +1546,6 @@ const CSS = `
   border: 2px solid var(--paper);
   cursor: pointer;
   box-shadow: 0 0 0 1px var(--ink);
-}
-
-.slider-item-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .slider-info-btn {
