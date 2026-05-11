@@ -18,6 +18,82 @@ const HORIZONS = {
   long: { label: '2035+', sub: 'Full transition', shift: 1 },
 };
 
+// Slider references — each slider gets a plain-language description plus
+// current signal and forecast data anchored to credible public sources
+// (IEA, DOE, BNEF, FERC, Wood Mackenzie, RMI, EIA). Surfaced in expandable panels.
+const SLIDER_REFERENCES = {
+  peak_pressure: {
+    measures: 'How much grid stress is driving demand for flexible load. Higher = bigger gap between peak demand and reliable supply, which means flexibility (load shifting, battery dispatch, demand response) is more valuable.',
+    current: 'US peak demand is rising for the first time in a decade — data centres, electrification, and onshoring are pushing it up while old coal and gas plants retire. DOE projects ~200 GW of new peak resource needs by 2030.',
+    forecast: 'DOE Liftoff: tripling current VPP capacity to 80–160 GW by 2030 could cover 10–20% of peak load and save $10B annually. Brattle finds residential VPPs deliver peaking capacity at 40–60% lower net cost than gas peakers.',
+    sources: [
+      { label: 'DOE Liftoff: Virtual Power Plants (2024)', url: 'https://liftoff.energy.gov/vpp/' },
+      { label: 'Brattle Group: Real Reliability', url: 'https://www.brattle.com/insights-events/publications/real-reliability/' },
+      { label: 'NERC Long-Term Reliability Assessment', url: 'https://www.nerc.com/pa/RAPA/ra/Pages/default.aspx' },
+    ],
+  },
+  resilience_demand: {
+    measures: 'How much customers and grids are willing to pay for backup capacity and outage hardening. Driven by outage frequency, climate exposure, and insurance dynamics.',
+    current: 'US average outage hours have roughly doubled since 2013 due to weather events. South Africa logged 250+ hours of Stage 4–6 load shedding in peak years. California, Texas, and the Northeast are seeing the strongest residential battery attach rates on new solar.',
+    forecast: 'BNEF: global energy storage market grows at ~23% CAGR through 2030. Residential battery attach rates on new solar have crossed 25–30% in California post-NEM 3.0 — primarily resilience-driven, not bill-driven.',
+    sources: [
+      { label: 'EIA Annual Electric Power Industry Report', url: 'https://www.eia.gov/electricity/data/eia861/' },
+      { label: 'BNEF Energy Storage Market Outlook', url: 'https://about.bnef.com/insights/clean-energy/energy-storage/' },
+      { label: 'Wood Mackenzie US Energy Storage Monitor', url: 'https://www.woodmac.com/research/products/power-and-renewables/us-energy-storage-monitor/' },
+    ],
+  },
+  electrification: {
+    measures: 'Speed of the heating/transport electrification transition. Faster electrification = more flexible loads to manage (heat pumps, EVs, hot water) and more revenue surface for orchestration.',
+    current: 'IEA: heat pumps outsold gas boilers in the US for the fourth year running in 2025. Germany flipped to heat pumps > gas boilers for the first time in 2025. Globally ~10% of building heating is heat-pump-based today (~100M households).',
+    forecast: 'IEA WEO 2025: heat pumps could meet ~40% of space heating demand in the US and Japan by 2035, and double their share in the EU and China. EVs already 7%+ of US new car sales; BNEF projects 30%+ globally by 2030. DOE expects 20–90 GW of EV charging demand capacity additions by 2030.',
+    sources: [
+      { label: 'IEA World Energy Outlook 2025', url: 'https://www.iea.org/reports/world-energy-outlook-2025' },
+      { label: 'IEA Renewables 2025', url: 'https://www.iea.org/reports/renewables-2025' },
+      { label: 'BNEF Electric Vehicle Outlook', url: 'https://about.bnef.com/insights/clean-transport/electric-vehicle-outlook/' },
+    ],
+  },
+  capital_depth: {
+    measures: 'How readily distributed-asset cash flows can be financed through project finance, ABS, or growth equity. Deeper capital = lower cost of customer acquisition (no upfront capex from customer), longer contract tenors viable.',
+    current: 'BNEF says 2025 will be a record-breaking year for energy storage despite tariff disruptions. DOE finalized a $3B partial loan guarantee for the first national-scale VPP project in 2023. Residential solar ABS spreads are 200–300bp over benchmarks. VPP-specific term sheets remain non-standardized.',
+    forecast: 'BNEF: global energy storage market grows from current ~$30B to $90B+ by 2030. Renew Home (Google Nest + OhmConnect) targeting 50 GW residential VPP by 2030 — entry of patient capital. ABS for solar+storage and heat pumps emerging but not yet for water heaters or smart panels.',
+    sources: [
+      { label: 'BNEF Energy Transition Investment Trends', url: 'https://about.bnef.com/insights/finance/energy-transition-investment/' },
+      { label: 'DOE Loan Programs Office', url: 'https://www.energy.gov/lpo/loan-programs-office' },
+      { label: 'Lazard Levelized Cost of Storage (LCOS+)', url: 'https://www.lazard.com/research-insights/' },
+    ],
+  },
+  customer_trust: {
+    measures: 'How easily a vendor can reach and acquire end customers. Captures CAC, brand strength, installer channel quality, and whether customers will hand over control of an in-home asset.',
+    current: 'Residential solar CAC has averaged $5k–7k+ since 2020 — the single largest cost component of an installed system. DOE Liftoff cites customer acquisition as the #1 barrier for residential DER deployment. Building-owner trust is the gating factor for multifamily decarb retrofits.',
+    forecast: 'Wood Mackenzie expects channel consolidation: utility programs, retail (Costco, Amazon), and embedded OEM partnerships (HVAC contractors, builders) take share from door-to-door. Auto-enrollment with opt-out (DOE-recommended) could collapse CAC for utility-sponsored VPPs.',
+    sources: [
+      { label: 'Wood Mackenzie US Residential Solar Markets Report', url: 'https://www.woodmac.com/research/products/power-and-renewables/us-solar-market-insight/' },
+      { label: 'DOE Liftoff: VPP Customer Enrollment', url: 'https://liftoff.energy.gov/vpp/' },
+      { label: 'LBNL Tracking the Sun', url: 'https://emp.lbl.gov/tracking-the-sun' },
+    ],
+  },
+  regulatory: {
+    measures: 'How welcoming the rules are to distributed energy resources and aggregators — net metering structure, demand charge design, DR program access, wholesale market participation, and emissions mandates that drive demand.',
+    current: 'FERC Order 2222 (2020) requires ISOs to allow DER aggregation in wholesale markets — implementation varies widely (CAISO, ISO-NE further along; MISO, SPP slower). NYC Local Law 97 began imposing building emissions caps in 2024 with stiff penalties. California NEM 3.0 cut residential solar export rates ~75%, killing the pure self-consumption play.',
+    forecast: 'NYC LL97 ratchets through 2030 and 2040 — driving multifamily retrofit demand. EU Energy Performance of Buildings Directive (revised 2024) mandates phaseout of new fossil heating by 2040. Rate design risk remains the largest underwriting variable for any 15+ year BTM asset.',
+    sources: [
+      { label: 'FERC Order 2222', url: 'https://www.ferc.gov/news-events/news/explainer-order-no-2222-fact-sheet' },
+      { label: 'NYC Local Law 97', url: 'https://www.nyc.gov/site/sustainability/our-programs/local-law-97.page' },
+      { label: 'CPUC NEM 3.0 / Net Billing', url: 'https://www.cpuc.ca.gov/industries-and-topics/electrical-energy/demand-side-management/net-energy-metering' },
+    ],
+  },
+  insurance: {
+    measures: 'Whether insurers are paying to harden homes and buildings against climate risk — through premium discounts, direct funding of mitigation equipment, or partnerships with hardware vendors. Creates a new (non-utility, non-customer) buyer of BTM assets.',
+    current: 'State Farm and Allstate paused new homeowner policies in California citing wildfire risk. Hippo, Lemonade, and Travelers are piloting leak-sensor subsidies. Munich Re and Swiss Re are funding adaptation pilots. Florida and Louisiana property markets effectively rationed.',
+    forecast: 'Swiss Re sustainability research models insured climate losses growing 5–7% per year through 2040. Expect insurer-funded resilience to expand from leak detection into batteries, smart panels, and grid-tied storage — particularly in fire/flood-exposed regions. Triple-net pairing of insurer + utility + vendor remains an open category.',
+    sources: [
+      { label: 'Swiss Re Institute — Natural Catastrophes', url: 'https://www.swissre.com/institute/research/topics-and-risk-dialogues/climate-and-natural-catastrophe-risk.html' },
+      { label: 'Munich Re NatCatSERVICE', url: 'https://www.munichre.com/en/solutions/for-industry-clients/natcatservice.html' },
+      { label: 'Insurance Information Institute Climate Reports', url: 'https://www.iii.org/' },
+    ],
+  },
+};
+
 const REASONS_MATRIX_BASE = {
   US: {
     consumer: { comfort: 2, capex: 2, resilience: 3, bills: 3, identity: 2 },
@@ -77,8 +153,27 @@ const TECHNOLOGIES = [
     secondary_driver: ['resilience'],
   },
   {
+    id: 'hybrid_electrification',
+    name: 'Hybrid Electrification (Dual Fuel)',
+    icon: '◑',
+    capex_score: 4,
+    capex_usd: '$2k–8k/unit (subscription available)',
+    lifespan: '15–20y',
+    dispatchability: 4,
+    flexibility: 4,
+    resilience: 4,
+    install_friction: 2,
+    margin_potential: 4,
+    value_stack: ['Decarb mandate compliance (LL97)', 'Gas avoidance during mild weather', 'DR/DSM', 'Comfort (AC included)', 'Avoided full retrofit capex'],
+    portfolio: 'Kelvin (NYC multifamily — Cozy + Adaptive Electrification)',
+    note: 'Keeps the existing gas boiler/furnace for cold-snap reliability but offloads shoulder seasons and cooling to in-unit heat pumps. Smart controls switch fuel based on temperature, price, and emissions. NYSERDA-verified 25.5% heating savings on Kelvin\u2019s Cozy alone; Kelvin\u2019s Hybrid Electrification platform delivers ~80% of full-electrification decarb at ~10% of the capex. Solves the dense-urban multifamily case where full HP retrofit is impractical (no roof space, panel constraints, tenant disruption).',
+    geo_fit: { US: 3, EU: 2, LATAM: 1, SA: 1, IN: 1 },
+    primary_driver: ['capex', 'comfort'],
+    secondary_driver: ['bills', 'identity', 'resilience'],
+  },
+  {
     id: 'heat_pump',
-    name: 'Heat Pump (Space + Water)',
+    name: 'Heat Pump (Full Electric)',
     icon: '◐',
     capex_score: 1,
     capex_usd: '$8k–18k installed',
@@ -89,8 +184,8 @@ const TECHNOLOGIES = [
     install_friction: 5,
     margin_potential: 3,
     value_stack: ['DR/DSM', 'Efficiency', 'Decarb mandate', 'Comfort premium'],
-    portfolio: 'Gradient (window unit), Kelvin (steam → hydronic conversion)',
-    note: 'Install capacity is the bottleneck, not technology. Window-unit and retrofit-friendly form factors unlock dense urban + multifamily.',
+    portfolio: 'Gradient (window-unit form factor for dense multifamily)',
+    note: 'Heat pumps outsold gas furnaces in the US for the 4th year running in 2025 (IEA). IEA projects ~40% of US space heating demand met by heat pumps by 2035. Install capacity is the bottleneck, not technology — window-unit and retrofit-friendly form factors unlock dense urban + multifamily.',
     geo_fit: { US: 3, EU: 3, LATAM: 1, SA: 1, IN: 2 },
     primary_driver: ['comfort', 'identity'],
     secondary_driver: ['bills', 'capex'],
@@ -265,12 +360,12 @@ const BUSINESS_MODELS = [
 ];
 
 const CAPITAL_MARKETS = [
-  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', heat_pump: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
-  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', heat_pump: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
-  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', heat_pump: 'emerging', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
-  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', heat_pump: 'emerging', smart_thermostat: 'limited', battery: 'mature', leak_thermal: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', heat_pump: 'limited', smart_thermostat: 'none', battery: 'emerging', leak_thermal: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', heat_pump: 'none', smart_thermostat: 'none', battery: 'limited', leak_thermal: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
+  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', hybrid_electrification: 'mature', heat_pump: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
+  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
+  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'emerging', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
+  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', hybrid_electrification: 'emerging', heat_pump: 'emerging', smart_thermostat: 'limited', battery: 'mature', leak_thermal: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', hybrid_electrification: 'limited', heat_pump: 'limited', smart_thermostat: 'none', battery: 'emerging', leak_thermal: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', hybrid_electrification: 'none', heat_pump: 'none', smart_thermostat: 'none', battery: 'limited', leak_thermal: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
 ];
 
 const WILDCARDS = [
@@ -425,6 +520,7 @@ const maturityLabel = (m) => ({ none: '—', limited: 'Limited', emerging: 'Emer
 // ============================================================================
 
 function TopBar({ geo, setGeo, horizon, setHorizon, sliders, setSliders, resetSliders }) {
+  const [openSlider, setOpenSlider] = useState(null);
   const sliderGroups = [
     {
       label: 'Market conditions',
@@ -494,21 +590,63 @@ function TopBar({ geo, setGeo, horizon, setHorizon, sliders, setSliders, resetSl
           <div key={gi} className="slider-group-block">
             <div className="slider-group-label">{group.label}</div>
             <div className="slider-group-items">
-              {group.items.map((s) => (
-                <div key={s.key} className="slider-item">
-                  <div className="slider-item-head">
-                    <span className="slider-item-name" title={s.help}>{s.name}</span>
-                    <span className="slider-item-val">{sliders[s.key]}</span>
+              {group.items.map((s) => {
+                const ref = SLIDER_REFERENCES[s.key];
+                const isOpen = openSlider === s.key;
+                return (
+                  <div key={s.key} className={`slider-item ${isOpen ? 'slider-item-open' : ''}`}>
+                    <div className="slider-item-head">
+                      <span className="slider-item-name">
+                        {s.name}
+                        {ref && (
+                          <button
+                            className={`slider-info-btn ${isOpen ? 'slider-info-btn-open' : ''}`}
+                            onClick={() => setOpenSlider(isOpen ? null : s.key)}
+                            aria-label={`${isOpen ? 'Hide' : 'Show'} details for ${s.name}`}
+                            title={isOpen ? 'Hide details' : 'Show description & references'}
+                          >
+                            {isOpen ? '×' : 'ⓘ'}
+                          </button>
+                        )}
+                      </span>
+                      <span className="slider-item-val">{sliders[s.key]}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={sliders[s.key]}
+                      onChange={(e) => setSliders({ ...sliders, [s.key]: +e.target.value })}
+                    />
+                    {isOpen && ref && (
+                      <div className="slider-details">
+                        <div className="slider-details-row">
+                          <span className="slider-details-label">What it measures</span>
+                          <span className="slider-details-text">{ref.measures}</span>
+                        </div>
+                        <div className="slider-details-row">
+                          <span className="slider-details-label">Current signal</span>
+                          <span className="slider-details-text">{ref.current}</span>
+                        </div>
+                        <div className="slider-details-row">
+                          <span className="slider-details-label">Forecast</span>
+                          <span className="slider-details-text">{ref.forecast}</span>
+                        </div>
+                        <div className="slider-details-row">
+                          <span className="slider-details-label">Sources</span>
+                          <span className="slider-details-sources">
+                            {ref.sources.map((src, i) => (
+                              <a key={i} href={src.url} target="_blank" rel="noopener noreferrer" className="slider-source-link">
+                                {src.label}
+                              </a>
+                            ))}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={sliders[s.key]}
-                    onChange={(e) => setSliders({ ...sliders, [s.key]: +e.target.value })}
-                  />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
@@ -1218,6 +1356,98 @@ const CSS = `
   border: 2px solid var(--paper);
   cursor: pointer;
   box-shadow: 0 0 0 1px var(--ink);
+}
+
+.slider-item-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slider-info-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: color 0.15s, background 0.15s;
+}
+
+.slider-info-btn:hover {
+  color: var(--ink);
+  background: var(--rule);
+}
+
+.slider-info-btn-open {
+  color: var(--ink);
+  background: var(--paper-2);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.slider-item-open {
+  background: var(--paper-2);
+  margin: 0 -10px;
+  padding: 8px 10px;
+  border-left: 2px solid var(--ink);
+}
+
+.slider-details {
+  margin-top: 10px;
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.slider-details-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.slider-details-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.slider-details-text {
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.slider-details-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slider-source-link {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-word;
+}
+
+.slider-source-link:hover {
+  color: var(--accent-2);
 }
 
 .context-strip {
