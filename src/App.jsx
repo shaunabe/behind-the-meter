@@ -287,6 +287,98 @@ const MARKET_SCALE = {
   },
 };
 
+// Adoption timeline — % penetration of addressable base, by tech × geography.
+// Anchor years 2020 / 2025 / 2030 / 2035. Numbers are best-estimate trajectories,
+// not forecasts. Anchored to IEA WEO 2025, DOE Liftoff (VPP), BNEF, EHPA market reports,
+// REPowerEU targets, and the MARKET_SCALE prose above. Embeds two macro forces:
+//   1. AI/datacenter capacity crunch — boosts aggregation/VPP and battery in markets
+//      with active wholesale + hyperscaler co-funding (US strongest, then EU).
+//   2. EU summer cooling surge — bumps EU heat pump (heating + cooling), smart
+//      thermostat (managing AC load), and battery (PV self-consumption in heatwaves).
+const ADOPTION_TIMELINE_YEARS = [2020, 2025, 2030, 2035];
+const ADOPTION_TIMELINE = {
+  water_heater: {
+    unit: '% of electric water heaters controlled',
+    US: [1, 4, 16, 40],
+    EU: [3, 10, 23, 40],
+    LATAM: [1, 2.5, 10, 25],
+    SA: [0.5, 2.5, 17, 42],
+    IN: [0.5, 1.7, 7, 20],
+  },
+  hybrid_electrification: {
+    unit: '% of addressable steam/gas multifamily',
+    US: [0, 0.2, 4, 20],
+    EU: [0, 0.2, 1.2, 8],
+    LATAM: [0, 0, 0.2, 1],
+    SA: [0, 0, 0.2, 0.5],
+    IN: [0, 0, 0.2, 0.5],
+  },
+  heat_pump: {
+    unit: '% of homes with heat pump as primary heat',
+    US: [18, 21, 32, 45],
+    EU: [16, 23, 45, 65],
+    LATAM: [0.5, 1, 3, 8],
+    SA: [0.5, 1, 3, 7],
+    IN: [5, 8, 17, 34],
+  },
+  commercial_heat: {
+    unit: '% of restaurant outdoor heating that is electric',
+    US: [0, 0.2, 3, 12],
+    EU: [0, 1, 10, 30],
+    LATAM: [0, 0.2, 1, 3],
+    SA: [0, 0, 0.2, 0.5],
+    IN: [0, 0, 0.2, 0.5],
+  },
+  smart_thermostat: {
+    unit: '% of HVAC-equipped homes with smart thermostat',
+    US: [35, 59, 78, 90],
+    EU: [8, 17, 35, 60],
+    LATAM: [1, 3, 8, 16],
+    SA: [3, 6, 18, 35],
+    IN: [2, 5, 15, 30],
+  },
+  battery: {
+    unit: '% of single-family homes with stationary battery',
+    US: [0.4, 0.9, 5, 13],
+    EU: [1, 3, 11, 22],
+    LATAM: [0.1, 0.3, 1.2, 3],
+    SA: [1, 3, 8, 16],
+    IN: [0.01, 0.1, 0.5, 1.5],
+  },
+  leak_thermal: {
+    unit: '% of insured properties with leak/asset sensors',
+    US: [3, 7, 20, 40],
+    EU: [3, 7, 18, 38],
+    LATAM: [0.5, 1, 4, 10],
+    SA: [1, 2, 8, 18],
+    IN: [0.3, 0.5, 2, 5],
+  },
+  aggregation: {
+    unit: '% of peak addressable via VPP / DER aggregation',
+    US: [3, 5, 14, 24],
+    EU: [5, 8, 15, 24],
+    LATAM: [1, 2, 5, 13],
+    SA: [0.5, 1, 7, 18],
+    IN: [0.2, 0.5, 5, 15],
+  },
+  ev: {
+    unit: '% of light-duty fleet that is electric',
+    US: [1, 4, 18, 38],
+    EU: [5, 12, 30, 50],
+    LATAM: [0.1, 0.5, 4, 15],
+    SA: [0.1, 0.3, 3, 12],
+    IN: [0.5, 2, 12, 35],
+  },
+  smart_panel: {
+    unit: '% of homes with smart electrical panel',
+    US: [0.1, 0.8, 4, 12],
+    EU: [0.05, 0.1, 0.5, 1.5],
+    LATAM: [0, 0.05, 0.3, 1],
+    SA: [0, 0.05, 0.3, 1],
+    IN: [0, 0.05, 0.5, 2],
+  },
+};
+
 const TECHNOLOGIES = [
   {
     id: 'water_heater',
@@ -545,11 +637,11 @@ const CAPITAL_MARKETS = [
 const WILDCARDS = [
   {
     id: 'gpu',
-    title: 'Hyperscaler-Funded Distributed Flex',
-    hook: 'Data centers are the new capacity constraint',
-    body: 'Brookfield + Bloom announced a $5B framework for 1 GW of behind-the-meter at AI factories. Aligned + PGE deployed 31 MW battery as a substitute for grid upgrades. The next move: hyperscalers funding residential/SMB flex as cheaper marginal capacity than building their own.',
-    implication: 'New, deep-pocketed off-taker for VPP capacity. Plentify and Kelvin could route flexible capacity to hyperscaler-funded programs alongside utility programs. Changes the unit economics of aggregation.',
-    timeframe: 'Already happening. Mid-decade scale.',
+    title: 'AI / Data Center Capacity Crunch',
+    hook: 'AI is the new peaker — and it can\u2019t wait for transmission',
+    body: 'IEA Energy and AI: global data center electricity consumption doubles from 415 TWh (2024) to 945 TWh by 2030. US accounts for ~half that growth — 183 TWh now to 426 TWh by 2030, a 133% jump. DOE estimates 50 GW of the 100 GW new peak capacity needed by 2030 is data-center-driven. BNEF puts US data center peak demand at ~106 GW by 2035. Globally ~2,500 GW of projects are stalled in interconnection queues; new transmission takes 7+ years. Brookfield + Bloom committed $5B for 1 GW of behind-the-meter at AI factories; Aligned + PGE deployed 31 MW battery as a grid-upgrade substitute. An advanced server rack will draw the load of 65 households by 2027.',
+    implication: 'Two effects on the BTM thesis. (1) Hyperscalers become a new, deep-pocketed off-taker for VPP capacity — Plentify and Kelvin can route flexible capacity to hyperscaler-funded programs alongside utility programs, with better economics than ratebased DR. (2) The locational concentration of AI load (data center clusters in NoVa, Phoenix, central Ohio) is sucking peak capacity out of nearby residential markets — making residential flex worth more in those nodes specifically. Aggregation and battery curves in the timeline reflect this pull.',
+    timeframe: 'Already happening. Capacity crunch intensifies through 2028.',
   },
   {
     id: 'compute_flex',
@@ -590,6 +682,14 @@ const WILDCARDS = [
     body: 'Two structural forces lock in hybrid heating as the equilibrium, not a transition step. (1) Customer side: gas furnaces last 15\u201320 years, boilers 15\u201330. Median US owner-occupied home is 42 years old. Even if heat pumps had 100% of new sales — and they only just edged ahead of gas furnaces — the installed gas base turns over on a multi-decade cycle, and the economic case for forcing premature replacement is weak (capex gap $10\u201315k per unit; marginal carbon abated drops sharply beyond ~80% electrification). (2) Grid side: ISO-NE\u2019s 2050 Transmission Study models a winter peak of ~51 GW under full electrification and explicitly assumes "the grid is 100% electrified for most of the year, with only the coldest days using some stored fuels for heating." The system planner\u2019s realistic scenario is hybrid. Building a grid to serve full-electric heating on the coldest 50 hours of the year is uneconomic compared to leaving gas in place for those hours.',
     implication: 'Kelvin\u2019s "keep the boiler, electrify what makes sense" isn\u2019t a compromise framing — it\u2019s the operating model the grid is being built around. The durable value moves to the orchestration layer: when to run gas vs. electric per building, per hour, per emissions intensity, per price signal. The dispatch layer is where defensibility lives. Suggests a longer runway than the "replace everything" decarb thesis implies, and reframes hybrid platforms as critical grid infrastructure rather than transitional tech.',
     timeframe: 'Structural through 2050+.',
+  },
+  {
+    id: 'eu_cooling',
+    title: 'EU Summer Cooling Surge',
+    hook: 'Buildings designed for cold need to handle 40\u00b0C',
+    body: 'Europe is warming twice as fast as the global average. The 2025 heatwaves drove daily power demand up 14% in Spain, 9% in France, 6% in Germany; electricity price spreads exceeded \u20ac400/MWh; Italy hit outages. France\u2019s evening peak ran +25% vs off-season. EU residential AC penetration is still ~20% (vs ~90% US), and just 19% in Germany, 18\u201326% in France — but the IEA projects EU AC units more than doubling to 275M by 2050. Europe AC market is on track from $25B (2024) to $43B (2033). Most northern/western EU housing was designed to retain heat, making it ill-suited for hot summers — meaning cooling demand grows on top of unchanged heating loads, not as a substitute.',
+    implication: 'Heat pumps win twice: they meet the REPowerEU heating target (60M units by 2030) AND replace the AC purchase, vs. installing both. The timeline reflects EU heat pump going 23%\u219245%\u219265% by 2035 — a steeper curve than US because cooling demand is pulling forward what was already a decarb-mandate trajectory. Knock-on effects: smart thermostats become essential for managing dual-peaking grids, batteries pair with PV for solar self-consumption during heatwaves (Ember notes EU solar generated record 45 TWh in June 2025), and Kelvin\u2019s hybrid model has a bigger EU TAM than the heating-only frame suggested.',
+    timeframe: 'Inflection now. Compounding through 2035.',
   },
 ];
 
@@ -1182,6 +1282,144 @@ function AdoptionMap({ geo, horizon, sliders }) {
   );
 }
 
+function AdoptionTimeline({ geo, horizon, sliders }) {
+  // Color each line by where the tech currently sits in cost-value space
+  // — connects this view to the Adoption Map directly.
+  const techData = useMemo(() => {
+    return TECHNOLOGIES.map((t) => {
+      const series = ADOPTION_TIMELINE[t.id];
+      if (!series || !series[geo]) return null;
+      const { cost, value } = computeCostValue(t, geo, horizon, sliders);
+      return { tech: t, points: series[geo], unit: series.unit, quadrant: adoptionQuadrant(cost, value).id };
+    }).filter(Boolean);
+  }, [geo, horizon, sliders]);
+
+  const W = 800;
+  const H = 460;
+  const PAD_L = 60;
+  const PAD_R = 30;
+  const PAD_T = 30;
+  const PAD_B = 56;
+  const plotW = W - PAD_L - PAD_R;
+  const plotH = H - PAD_T - PAD_B;
+  const years = ADOPTION_TIMELINE_YEARS;
+  const yearMin = years[0];
+  const yearMax = years[years.length - 1];
+  const xPos = (yr) => PAD_L + ((yr - yearMin) / (yearMax - yearMin)) * plotW;
+  const yPos = (pct) => PAD_T + (1 - Math.min(pct, 100) / 100) * plotH;
+
+  const quadrantColor = {
+    pull: 'var(--accent)',
+    mandate: 'var(--gold)',
+    addon: 'var(--ink-3)',
+    stranded: 'var(--warm)',
+  };
+
+  // Short labels (same mapping as the cost-value map)
+  const shortName = (n) => n
+    .replace('Smart Electric Water Heater', 'Water Heater')
+    .replace('Hybrid Electrification (Dual Fuel)', 'Hybrid Elec')
+    .replace('Heat Pump (Full Electric)', 'Heat Pump')
+    .replace('Commercial / Outdoor Electric Heat', 'Commercial Heat')
+    .replace('Smart Thermostat / HVAC Controls', 'Thermostat')
+    .replace('Stationary Battery (Home/SMB)', 'Battery')
+    .replace('Leak / Cold-Chain / Asset Sensors', 'Sensors')
+    .replace('Aggregation / VPP Software', 'Aggregation')
+    .replace('EV / V2G / Managed Charging', 'EV / V2G')
+    .replace('Smart Electrical Panel', 'Smart Panel');
+
+  // Build path string for each tech
+  const pathFor = (points) => points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xPos(years[i])} ${yPos(p)}`).join(' ');
+
+  // For label positioning at the right edge — stagger to reduce collision
+  const sortedByEnd = [...techData].sort((a, b) => b.points[b.points.length - 1] - a.points[a.points.length - 1]);
+  const labelY = (idx, raw) => {
+    // Bias labels apart vertically when endpoints are close
+    return yPos(raw);
+  };
+
+  // Y-axis tick values
+  const yTicks = [0, 25, 50, 75, 100];
+
+  return (
+    <div className="timeline-wrap">
+      <div className="timeline-header">
+        <div className="timeline-title">Adoption trajectories · {geo}</div>
+        <div className="timeline-sub">% penetration of addressable base · line color matches Adoption Map quadrant</div>
+      </div>
+
+      <svg viewBox={`0 0 ${W} ${H}`} className="timeline-svg" preserveAspectRatio="xMidYMid meet">
+        {/* Plot area background */}
+        <rect x={PAD_L} y={PAD_T} width={plotW} height={plotH} fill="var(--paper-2)" />
+
+        {/* Y-axis gridlines */}
+        {yTicks.map((t) => (
+          <g key={t}>
+            <line x1={PAD_L} y1={yPos(t)} x2={PAD_L + plotW} y2={yPos(t)} stroke="var(--rule)" strokeWidth="1" strokeDasharray={t === 0 ? '' : '2 3'} />
+            <text x={PAD_L - 10} y={yPos(t) + 4} className="timeline-axis-tick" textAnchor="end">{t}%</text>
+          </g>
+        ))}
+
+        {/* X-axis */}
+        <line x1={PAD_L} y1={PAD_T + plotH} x2={PAD_L + plotW} y2={PAD_T + plotH} stroke="var(--ink)" strokeWidth="1" />
+        {years.map((yr) => (
+          <g key={yr}>
+            <line x1={xPos(yr)} y1={PAD_T + plotH} x2={xPos(yr)} y2={PAD_T + plotH + 4} stroke="var(--ink)" strokeWidth="1" />
+            <text x={xPos(yr)} y={PAD_T + plotH + 18} className="timeline-axis-tick" textAnchor="middle">{yr}</text>
+          </g>
+        ))}
+
+        {/* Axis labels */}
+        <text x={20} y={PAD_T + plotH / 2} className="timeline-axis-label" textAnchor="middle" transform={`rotate(-90 20 ${PAD_T + plotH / 2})`}>PENETRATION %</text>
+
+        {/* Lines per tech */}
+        {techData.map(({ tech, points, quadrant }) => {
+          const isPortfolio = tech.portfolio && tech.portfolio !== '\u2014';
+          const color = quadrantColor[quadrant];
+          return (
+            <g key={tech.id}>
+              <path
+                d={pathFor(points)}
+                fill="none"
+                stroke={color}
+                strokeWidth={isPortfolio ? 2.5 : 1.5}
+                strokeDasharray={isPortfolio ? '' : '4 3'}
+                opacity={0.9}
+              />
+              {points.map((p, i) => (
+                <circle key={i} cx={xPos(years[i])} cy={yPos(p)} r="3" fill={color} stroke="var(--paper)" strokeWidth="1.5" />
+              ))}
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* Legend with endpoint values, sorted by 2035 endpoint descending */}
+      <div className="timeline-legend">
+        {sortedByEnd.map(({ tech, points, quadrant }) => {
+          const isPortfolio = tech.portfolio && tech.portfolio !== '\u2014';
+          const color = quadrantColor[quadrant];
+          const start = points[0];
+          const end = points[points.length - 1];
+          const growth = start > 0 ? ((end / start - 1) * 100) : null;
+          return (
+            <div key={tech.id} className="tl-legend-row">
+              <span className="tl-legend-swatch" style={{ background: color, borderStyle: isPortfolio ? 'solid' : 'dashed', borderColor: color }} />
+              <span className="tl-legend-name">{shortName(tech.name)}{isPortfolio ? ' ·' : ''}</span>
+              <span className="tl-legend-end">{end}%</span>
+              <span className="tl-legend-delta">{start > 0 && growth !== null ? `${growth >= 1000 ? '\u003e10\u00d7' : growth >= 100 ? Math.round(growth / 100) + '\u00d7' : '+' + Math.round(growth) + '%'} from ${start}%` : 'from \u2014'}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="timeline-footnote">
+        Trajectories reflect IEA WEO 2025 (heat pumps, EVs), DOE Liftoff (VPP), EHPA / REPowerEU targets, BNEF storage outlook, and the MARKET_SCALE prose above. Embeds two macro forces: AI/datacenter capacity crunch pulls aggregation and battery curves higher in US/EU; EU summer cooling surge accelerates EU heat pump (heating + cooling), thermostat, and battery curves.
+      </div>
+    </div>
+  );
+}
+
 function BusinessModels({ sliders }) {
   const scored = useMemo(() => {
     return BUSINESS_MODELS.map((m) => ({ model: m, ...scoreBusinessModel(m, sliders) }))
@@ -1423,6 +1661,21 @@ export default function App() {
 
       <section className="section">
         <div className="section-marker">V</div>
+        <h2 className="section-title">Adoption over time</h2>
+        <p className="section-lede">
+          From snapshot to trajectory. Penetration of addressable base by year, by geography. Line
+          color matches the cost-value quadrant each tech currently occupies; solid lines are
+          portfolio-represented technologies, dashed are adjacent categories. Trajectories embed
+          two macro forces — the AI/datacenter capacity crunch (pulling aggregation and battery
+          curves higher in markets with active wholesale plus hyperscaler co-funding) and the EU
+          summer cooling surge (accelerating EU heat pump, thermostat, and battery curves as
+          buildings designed for cold need to handle 40°C summers).
+        </p>
+        <AdoptionTimeline geo={geo} horizon={horizon} sliders={sliders} />
+      </section>
+
+      <section className="section">
+        <div className="section-marker">VI</div>
         <h2 className="section-title">Business models</h2>
         <p className="section-lede">
           Solar walked from cash through PPA, lease, and loan over fifteen years. Each shift was
@@ -1434,7 +1687,7 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">VI</div>
+        <div className="section-marker">VII</div>
         <h2 className="section-title">Capital markets readiness</h2>
         <p className="section-lede">
           Capital flows to assets it can underwrite. Each technology must traverse the stack from
@@ -1446,7 +1699,7 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">VII</div>
+        <div className="section-marker">VIII</div>
         <h2 className="section-title">Wildcards</h2>
         <p className="section-lede">
           Forces that could rewrite the economics of distributed flexibility. The hyperscaler
@@ -2815,6 +3068,113 @@ const CSS = `
 
 @media (max-width: 700px) {
   .adoption-legend { grid-template-columns: 1fr; }
+}
+
+.timeline-wrap {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 24px 28px;
+}
+
+.timeline-header {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+}
+
+.timeline-title {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.timeline-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+.timeline-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.timeline-svg .timeline-axis-tick {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--ink-3);
+}
+
+.timeline-svg .timeline-axis-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.timeline-legend {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 16px;
+}
+
+.tl-legend-row {
+  display: grid;
+  grid-template-columns: 16px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 11px;
+}
+
+.tl-legend-swatch {
+  width: 14px;
+  height: 3px;
+  border: 1px solid;
+  border-style: solid;
+}
+
+.tl-legend-name {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.tl-legend-end {
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.tl-legend-delta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+.timeline-footnote {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--rule);
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .timeline-legend { grid-template-columns: 1fr; }
+  .tl-legend-row { grid-template-columns: 16px 1fr auto; }
+  .tl-legend-delta { display: none; }
 }
 
 .ftr {
