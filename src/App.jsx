@@ -167,6 +167,21 @@ const MARKET_SCALE = {
       { label: 'ACEEE Hybrid Heating Research', url: 'https://www.aceee.org/' },
     ],
   },
+  commercial_heat: {
+    headline: 'Propane displacement in restaurant + hospitality outdoor heating',
+    geos: {
+      US: '~700k restaurants (NRA); ~250k+ added outdoor dining post-COVID. Propane patio heater incumbents (~5M units installed); Focal addressable beachhead in coastal-climate hospitality. Energy footprint small per unit but high margin and brand-driven.',
+      EU: 'Strong outdoor dining culture (Spain, Italy, France, UK); EU phase-out of patio gas heaters under discussion in several member states. Addressable ~500k+ venues.',
+      LATAM: 'Seasonal use in high-altitude and southern-cone markets (Chile, Argentina, southern Brazil); niche but growing with hospitality recovery.',
+      SA: 'Climate limits demand; some Cape Town / winter Highveld use. Small niche.',
+      IN: 'Hill stations (Shimla, Manali) seasonal; otherwise climate doesn\u2019t require it.',
+    },
+    sources: [
+      { label: 'National Restaurant Association State of the Industry', url: 'https://www.restaurant.org/' },
+      { label: 'NYC Open Restaurants Program Data', url: 'https://www.nyc.gov/' },
+      { label: 'EU Propane Phase-Out Discussions (Eurelectric)', url: 'https://www.eurelectric.org/' },
+    ],
+  },
   heat_pump: {
     headline: 'Mainstream in cold-climate developed economies; install capacity is the constraint',
     geos: {
@@ -331,6 +346,25 @@ const TECHNOLOGIES = [
     secondary_driver: ['bills', 'capex'],
   },
   {
+    id: 'commercial_heat',
+    name: 'Commercial / Outdoor Electric Heat',
+    icon: '☀',
+    capex_score: 4,
+    capex_usd: '$500–2,000/heater',
+    lifespan: '10–15y',
+    dispatchability: 2,
+    flexibility: 2,
+    resilience: 0,
+    install_friction: 1,
+    margin_potential: 4,
+    value_stack: ['Propane displacement', 'Patio season extension', 'Avoided fossil logistics', 'Energy savings (vs propane)', 'Hospitality comfort / UX'],
+    portfolio: 'Focal (plug-in electric heaters for restaurants & outdoor dining)',
+    note: 'Not a grid-services play — a commercial-appliance electrification play. Plug-and-play 120V outlets, no gas line/hardwiring/permits, up to 80% energy savings vs propane and 75% installation savings. Targets the ~700k US restaurant market and outdoor dining boom. Adds controllable load that could participate in DR longer-term, but comfort-driven not capacity-driven today.',
+    geo_fit: { US: 3, EU: 3, LATAM: 2, SA: 1, IN: 1 },
+    primary_driver: ['capex', 'bills'],
+    secondary_driver: ['comfort', 'identity'],
+  },
+  {
     id: 'smart_thermostat',
     name: 'Smart Thermostat / HVAC Controls',
     icon: '◷',
@@ -400,8 +434,8 @@ const TECHNOLOGIES = [
     install_friction: 1,
     margin_potential: 5,
     value_stack: ['Capacity', 'Ancillary services', 'Wholesale', 'Distribution deferral'],
-    portfolio: 'Focal (DER aggregation & wholesale market)',
-    note: 'The missing middle. Dispatch rights, customer relationship, and data ownership are the three contested layers.',
+    portfolio: '—',
+    note: 'The missing middle. Dispatch rights, customer relationship, and data ownership are the three contested layers. No TS portfolio company in this layer today; the closest adjacency is per-asset orchestration baked into Plentify, Kelvin, and Flair stacks rather than cross-portfolio aggregation.',
     geo_fit: { US: 3, EU: 2, LATAM: 1, SA: 1, IN: 1 },
     primary_driver: ['bills', 'capex'],
     secondary_driver: ['resilience', 'identity'],
@@ -500,12 +534,12 @@ const BUSINESS_MODELS = [
 ];
 
 const CAPITAL_MARKETS = [
-  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', hybrid_electrification: 'mature', heat_pump: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
-  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
-  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'emerging', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
-  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', hybrid_electrification: 'emerging', heat_pump: 'emerging', smart_thermostat: 'limited', battery: 'mature', leak_thermal: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', hybrid_electrification: 'limited', heat_pump: 'limited', smart_thermostat: 'none', battery: 'emerging', leak_thermal: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', hybrid_electrification: 'none', heat_pump: 'none', smart_thermostat: 'none', battery: 'limited', leak_thermal: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
+  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', hybrid_electrification: 'mature', heat_pump: 'mature', commercial_heat: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
+  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'mature', commercial_heat: 'emerging', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
+  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'limited', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
+  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'none', smart_thermostat: 'limited', battery: 'mature', leak_thermal: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', hybrid_electrification: 'limited', heat_pump: 'limited', commercial_heat: 'none', smart_thermostat: 'none', battery: 'emerging', leak_thermal: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', hybrid_electrification: 'none', heat_pump: 'none', commercial_heat: 'none', smart_thermostat: 'none', battery: 'limited', leak_thermal: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
 ];
 
 const WILDCARDS = [
@@ -514,7 +548,7 @@ const WILDCARDS = [
     title: 'Hyperscaler-Funded Distributed Flex',
     hook: 'Data centers are the new capacity constraint',
     body: 'Brookfield + Bloom announced a $5B framework for 1 GW of behind-the-meter at AI factories. Aligned + PGE deployed 31 MW battery as a substitute for grid upgrades. The next move: hyperscalers funding residential/SMB flex as cheaper marginal capacity than building their own.',
-    implication: 'New, deep-pocketed off-taker for VPP capacity. Plentify/Kelvin/Focal could route capacity to hyperscaler-funded programs alongside utility programs. Changes the unit economics of aggregation.',
+    implication: 'New, deep-pocketed off-taker for VPP capacity. Plentify and Kelvin could route flexible capacity to hyperscaler-funded programs alongside utility programs. Changes the unit economics of aggregation.',
     timeframe: 'Already happening. Mid-decade scale.',
   },
   {
@@ -522,7 +556,7 @@ const WILDCARDS = [
     title: 'Compute Flexibility (Workload Shifting)',
     hook: 'Software is cheaper than batteries',
     body: 'Emerald AI demonstrated 25% peak reduction at a data center via GPU workload orchestration. Software flexibility deploys in weeks, not years, with no permitting. Two parallel BTM stories: (1) classic distributed flex (your portfolio), (2) hyperscale internal flex.',
-    implication: 'Compute flex competes with BTM batteries on the margin for grid services, but also creates demand for orchestration platforms — a Focal-adjacent opportunity.',
+    implication: 'Compute flex competes with BTM batteries on the margin for grid services, and creates demand for orchestration platforms — an open category in our portfolio, currently filled by per-asset dispatch software inside Plentify, Kelvin, and Flair rather than a cross-asset aggregator.',
     timeframe: 'Now → 2027 for early adopters; 2030 for mainstream.',
   },
   {
@@ -538,7 +572,7 @@ const WILDCARDS = [
     title: 'The Rate-Basing Fight',
     hook: 'Who owns the asset matters more than what it does',
     body: 'Wood Mackenzie: a majority of VPP aggregators oppose utilities rate-basing DERs (the "Distributed Capacity Procurement" model). The fight is whether ratepayers fund DERs (utility-owned, rate-based) or whether private capital + customers do (third-party-owned).',
-    implication: 'Existential for aggregators like Focal. Determines whether the next decade of DER capital flows through utility ratebase or through private project finance.',
+    implication: 'Existential for third-party DER aggregators. Determines whether the next decade of DER capital flows through utility ratebase or through private project finance — and which side of that line our hardware portfolio companies (Plentify, Kelvin, Gradient, Flair) end up selling into.',
     timeframe: 'Active regulatory fight 2026–2028.',
   },
   {
@@ -554,7 +588,7 @@ const WILDCARDS = [
     title: 'Hybrid Heating as Permanent Grid Infrastructure',
     hook: 'Load switching isn\u2019t the bridge \u2014 it\u2019s the destination',
     body: 'Two structural forces lock in hybrid heating as the equilibrium, not a transition step. (1) Customer side: gas furnaces last 15\u201320 years, boilers 15\u201330. Median US owner-occupied home is 42 years old. Even if heat pumps had 100% of new sales — and they only just edged ahead of gas furnaces — the installed gas base turns over on a multi-decade cycle, and the economic case for forcing premature replacement is weak (capex gap $10\u201315k per unit; marginal carbon abated drops sharply beyond ~80% electrification). (2) Grid side: ISO-NE\u2019s 2050 Transmission Study models a winter peak of ~51 GW under full electrification and explicitly assumes "the grid is 100% electrified for most of the year, with only the coldest days using some stored fuels for heating." The system planner\u2019s realistic scenario is hybrid. Building a grid to serve full-electric heating on the coldest 50 hours of the year is uneconomic compared to leaving gas in place for those hours.',
-    implication: 'Kelvin\u2019s "keep the boiler, electrify what makes sense" isn\u2019t a compromise framing — it\u2019s the operating model the grid is being built around. The durable value moves to the orchestration layer: when to run gas vs. electric per building, per hour, per emissions intensity, per price signal. This is the same dispatch-layer thesis as Focal applied to one customer asset rather than a portfolio. Suggests a longer runway than the "replace everything" decarb thesis implies, and reframes hybrid platforms as critical grid infrastructure rather than transitional tech.',
+    implication: 'Kelvin\u2019s "keep the boiler, electrify what makes sense" isn\u2019t a compromise framing — it\u2019s the operating model the grid is being built around. The durable value moves to the orchestration layer: when to run gas vs. electric per building, per hour, per emissions intensity, per price signal. The dispatch layer is where defensibility lives. Suggests a longer runway than the "replace everything" decarb thesis implies, and reframes hybrid platforms as critical grid infrastructure rather than transitional tech.',
     timeframe: 'Structural through 2050+.',
   },
 ];
