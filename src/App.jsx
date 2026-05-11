@@ -409,6 +409,14 @@ const WILDCARDS = [
     implication: 'Treat "device intelligence" as a separate axis from physical hardware. Companies that own both the device and the dispatch layer have the strongest position.',
     timeframe: 'Compounds over time. Today is the cheapest the moat will ever be.',
   },
+  {
+    id: 'hybrid_equilibrium',
+    title: 'Hybrid Heating as Permanent Grid Infrastructure',
+    hook: 'Load switching isn\u2019t the bridge \u2014 it\u2019s the destination',
+    body: 'Two structural forces lock in hybrid heating as the equilibrium, not a transition step. (1) Customer side: gas furnaces last 15\u201320 years, boilers 15\u201330. Median US owner-occupied home is 42 years old. Even if heat pumps had 100% of new sales — and they only just edged ahead of gas furnaces — the installed gas base turns over on a multi-decade cycle, and the economic case for forcing premature replacement is weak (capex gap $10\u201315k per unit; marginal carbon abated drops sharply beyond ~80% electrification). (2) Grid side: ISO-NE\u2019s 2050 Transmission Study models a winter peak of ~51 GW under full electrification and explicitly assumes "the grid is 100% electrified for most of the year, with only the coldest days using some stored fuels for heating." The system planner\u2019s realistic scenario is hybrid. Building a grid to serve full-electric heating on the coldest 50 hours of the year is uneconomic compared to leaving gas in place for those hours.',
+    implication: 'Kelvin\u2019s "keep the boiler, electrify what makes sense" isn\u2019t a compromise framing — it\u2019s the operating model the grid is being built around. The durable value moves to the orchestration layer: when to run gas vs. electric per building, per hour, per emissions intensity, per price signal. This is the same dispatch-layer thesis as Focal applied to one customer asset rather than a portfolio. Suggests a longer runway than the "replace everything" decarb thesis implies, and reframes hybrid platforms as critical grid infrastructure rather than transitional tech.',
+    timeframe: 'Structural through 2050+.',
+  },
 ];
 
 const ROOFTOP_SOLAR_HISTORY = [
