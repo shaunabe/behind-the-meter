@@ -688,6 +688,48 @@ function scoreBusinessModel(model, sliders) {
   return { score, bottleneck };
 }
 
+// Cost vs received value — used by the adoption map.
+// Cost dimension: capex difficulty + install friction (supply-side resistance).
+// Value dimension: customer-pull from reasons matrix + slider-weighted flexibility / resilience.
+// Kept orthogonal from each other so techs scatter rather than collapse to a diagonal.
+function computeCostValue(tech, geo, horizon, sliders) {
+  // Cost — higher capex_score means cheaper, install_friction 1 = easy / 5 = hard
+  const capexPart = (5 - tech.capex_score) * 12;        // 0-48
+  const installPart = (tech.install_friction - 1) * 13; // 0-52
+  const cost = Math.max(0, Math.min(100, capexPart + installPart));
+
+  // Value — averaged across customer types for current geo + horizon,
+  // weighted to this tech's primary (2x) and secondary (1x) drivers
+  const baseRow = REASONS_MATRIX_BASE[geo];
+  const customers = ['consumer', 'building', 'utility'];
+  let pull = 0;
+  let weight = 0;
+  for (const customer of customers) {
+    const adjusted = adjustReasonsForHorizon(baseRow[customer], horizon);
+    for (const reason of (tech.primary_driver || [])) {
+      pull += (adjusted[reason] || 0) * 2;
+      weight += 2;
+    }
+    for (const reason of (tech.secondary_driver || [])) {
+      pull += (adjusted[reason] || 0) * 1;
+      weight += 1;
+    }
+  }
+  const demandBase = weight > 0 ? (pull / weight) * 22 : 0; // 0-66 normalized
+
+  // Slider-driven additions — peak pressure rewards flexible techs, resilience
+  // demand rewards resilience-heavy techs, customer trust eases adoption pull
+  const flexBoost = (tech.flexibility || 0) * (sliders.peak_pressure / 100) * 4;       // 0-20
+  const resBoost = (tech.resilience || 0) * (sliders.resilience_demand / 100) * 3;     // 0-15
+  const trustBoost = (sliders.customer_trust / 100) * 5;                                // 0-5
+
+  // Geo fit dampens value where the tech doesn't suit the region
+  const geoMult = { 1: 0.55, 2: 0.85, 3: 1.0 }[tech.geo_fit[geo]] || 0.5;
+  const value = Math.max(0, Math.min(100, (demandBase + flexBoost + resBoost + trustBoost) * geoMult));
+
+  return { cost: Math.round(cost), value: Math.round(value) };
+}
+
 // ============================================================================
 // HELPERS
 // ============================================================================
@@ -696,6 +738,15 @@ const intensityClass = (v) => ({ 0: 'cell-0', 1: 'cell-1', 2: 'cell-2', 3: 'cell
 const intensityLabel = (v) => ({ 0: '—', 1: 'Emerging', 2: 'Material', 3: 'Primary' }[v] || '—');
 const maturityClass = (m) => `maturity-${m}`;
 const maturityLabel = (m) => ({ none: '—', limited: 'Limited', emerging: 'Emerging', mature: 'Mature' }[m] || '—');
+
+// Classify a tech's cost-value position into one of four adoption regimes.
+// Quadrant thresholds at 50/50.
+function adoptionQuadrant(cost, value) {
+  if (value >= 50 && cost < 50) return { id: 'pull', label: 'Mainstream Pull', desc: 'Cheap + valued. Adopts on its own. Solve channel and supply.' };
+  if (value >= 50 && cost >= 50) return { id: 'mandate', label: 'Mandate / Premium', desc: 'Valued but expensive. Needs mandates, subsidies, or premium segments.' };
+  if (value < 50 && cost < 50) return { id: 'addon', label: 'Add-on / Impulse', desc: 'Cheap but optional. Bundles or attach-on with adjacent purchase.' };
+  return { id: 'stranded', label: 'Stranded (Won\u2019t Move)', desc: 'Expensive + unloved. Won\u2019t happen without subsidy reset or value-stack change.' };
+}
 
 // ============================================================================
 // SUB-COMPONENTS
@@ -1008,6 +1059,129 @@ function TechGrid({ geo, horizon, sliders }) {
   );
 }
 
+function AdoptionMap({ geo, horizon, sliders }) {
+  const points = useMemo(() => {
+    return TECHNOLOGIES.map((t) => {
+      const { cost, value } = computeCostValue(t, geo, horizon, sliders);
+      const q = adoptionQuadrant(cost, value);
+      return { tech: t, cost, value, quadrant: q };
+    });
+  }, [geo, horizon, sliders]);
+
+  // SVG viewBox — keep aspect generous for labels
+  const W = 760;
+  const H = 480;
+  const PAD_L = 70;
+  const PAD_R = 30;
+  const PAD_T = 50;
+  const PAD_B = 60;
+  const plotW = W - PAD_L - PAD_R;
+  const plotH = H - PAD_T - PAD_B;
+  const x = (cost) => PAD_L + (cost / 100) * plotW;
+  const y = (value) => PAD_T + (1 - value / 100) * plotH;
+
+  // Short labels for the chart so they don't collide
+  const shortName = (n) => n
+    .replace('Smart Electric Water Heater', 'Water Heater')
+    .replace('Hybrid Electrification (Dual Fuel)', 'Hybrid Elec')
+    .replace('Heat Pump (Full Electric)', 'Heat Pump')
+    .replace('Commercial / Outdoor Electric Heat', 'Commercial Heat')
+    .replace('Smart Thermostat / HVAC Controls', 'Thermostat')
+    .replace('Stationary Battery (Home/SMB)', 'Battery')
+    .replace('Leak / Cold-Chain / Asset Sensors', 'Sensors')
+    .replace('Aggregation / VPP Software', 'Aggregation')
+    .replace('EV / V2G / Managed Charging', 'EV / V2G')
+    .replace('Smart Electrical Panel', 'Smart Panel');
+
+  // Color by quadrant — brand-aligned
+  const quadrantColor = {
+    pull: 'var(--accent)',       // Blue — strong adoption pull
+    mandate: 'var(--gold)',      // Green — mandate/premium territory
+    addon: 'var(--ink-3)',       // Gray — minor add-on
+    stranded: 'var(--warm)',     // Red — won't move
+  };
+
+  // Label offset jitter to reduce collisions (deterministic by tech id hash)
+  const labelOffset = (id, value) => {
+    const h = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
+    const dx = (h % 3) * 6 + 10;
+    const dy = value > 75 ? 18 : -8;
+    return { dx, dy };
+  };
+
+  return (
+    <div className="adoption-wrap">
+      <div className="adoption-header">
+        <div className="adoption-title">Cost-vs-value position · {geo}</div>
+        <div className="adoption-sub">Where each technology sits in current conditions</div>
+      </div>
+
+      <svg viewBox={`0 0 ${W} ${H}`} className="adoption-svg" preserveAspectRatio="xMidYMid meet">
+        {/* Plot area background */}
+        <rect x={PAD_L} y={PAD_T} width={plotW} height={plotH} fill="var(--paper-2)" />
+
+        {/* Quadrant dividers */}
+        <line x1={x(50)} y1={PAD_T} x2={x(50)} y2={PAD_T + plotH} stroke="var(--rule)" strokeWidth="1" />
+        <line x1={PAD_L} y1={y(50)} x2={PAD_L + plotW} y2={y(50)} stroke="var(--rule)" strokeWidth="1" />
+
+        {/* Quadrant labels */}
+        <text x={x(25)} y={PAD_T + 22} className="quad-label" textAnchor="middle">MAINSTREAM PULL</text>
+        <text x={x(25)} y={PAD_T + 38} className="quad-sub" textAnchor="middle">cheap + valued · adopts on its own</text>
+
+        <text x={x(75)} y={PAD_T + 22} className="quad-label" textAnchor="middle">MANDATE / PREMIUM</text>
+        <text x={x(75)} y={PAD_T + 38} className="quad-sub" textAnchor="middle">valued but expensive · needs push</text>
+
+        <text x={x(25)} y={PAD_T + plotH - 28} className="quad-label" textAnchor="middle">ADD-ON / IMPULSE</text>
+        <text x={x(25)} y={PAD_T + plotH - 12} className="quad-sub" textAnchor="middle">cheap but optional · bundles</text>
+
+        <text x={x(75)} y={PAD_T + plotH - 28} className="quad-label" textAnchor="middle">STRANDED</text>
+        <text x={x(75)} y={PAD_T + plotH - 12} className="quad-sub" textAnchor="middle">expensive + unloved · won&rsquo;t move</text>
+
+        {/* Axes */}
+        <line x1={PAD_L} y1={PAD_T + plotH} x2={PAD_L + plotW} y2={PAD_T + plotH} stroke="var(--ink)" strokeWidth="1" />
+        <line x1={PAD_L} y1={PAD_T} x2={PAD_L} y2={PAD_T + plotH} stroke="var(--ink)" strokeWidth="1" />
+
+        {/* Axis labels */}
+        <text x={PAD_L + plotW / 2} y={H - 20} className="axis-label" textAnchor="middle">RELATIVE COST · capex + install friction →</text>
+        <text x={20} y={PAD_T + plotH / 2} className="axis-label" textAnchor="middle" transform={`rotate(-90 20 ${PAD_T + plotH / 2})`}>RECEIVED VALUE · demand pull + flex/resilience →</text>
+
+        {/* Plot points */}
+        {points.map(({ tech, cost, value, quadrant }) => {
+          const cx = x(cost);
+          const cy = y(value);
+          const { dx, dy } = labelOffset(tech.id, value);
+          const color = quadrantColor[quadrant.id];
+          return (
+            <g key={tech.id}>
+              <circle cx={cx} cy={cy} r="6" fill={color} stroke="var(--paper)" strokeWidth="2" />
+              <text x={cx + dx} y={cy + dy} className="point-label" fill="var(--ink)">
+                {shortName(tech.name)}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+
+      <div className="adoption-legend">
+        {['pull', 'mandate', 'addon', 'stranded'].map((qid) => {
+          const inQ = points.filter((p) => p.quadrant.id === qid);
+          const q = adoptionQuadrant(qid === 'pull' || qid === 'addon' ? 25 : 75, qid === 'pull' || qid === 'mandate' ? 75 : 25);
+          return (
+            <div key={qid} className="legend-block">
+              <div className="legend-head">
+                <span className="legend-dot" style={{ background: quadrantColor[qid] }} />
+                <span className="legend-name">{q.label}</span>
+              </div>
+              <div className="legend-techs">{inQ.length ? inQ.map((p) => shortName(p.tech.name)).join(' · ') : '—'}</div>
+              <div className="legend-desc">{q.desc}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function BusinessModels({ sliders }) {
   const scored = useMemo(() => {
     return BUSINESS_MODELS.map((m) => ({ model: m, ...scoreBusinessModel(m, sliders) }))
@@ -1235,6 +1409,20 @@ export default function App() {
 
       <section className="section">
         <div className="section-marker">IV</div>
+        <h2 className="section-title">Adoption map · cost vs received value</h2>
+        <p className="section-lede">
+          Adoption ultimately falls along cost vs value. Each technology is placed by relative cost
+          (capex + install friction on the supply side) and received value (customer demand pull
+          from the reasons matrix, weighted by current slider conditions for flexibility, resilience,
+          and trust). The quadrant a technology lands in implies the adoption shape it will take —
+          mainstream pull, mandate/premium push, optional add-on, or stranded without a value-stack
+          reset.
+        </p>
+        <AdoptionMap geo={geo} horizon={horizon} sliders={sliders} />
+      </section>
+
+      <section className="section">
+        <div className="section-marker">V</div>
         <h2 className="section-title">Business models</h2>
         <p className="section-lede">
           Solar walked from cash through PPA, lease, and loan over fifteen years. Each shift was
@@ -1246,7 +1434,7 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">V</div>
+        <div className="section-marker">VI</div>
         <h2 className="section-title">Capital markets readiness</h2>
         <p className="section-lede">
           Capital flows to assets it can underwrite. Each technology must traverse the stack from
@@ -1258,7 +1446,7 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">VI</div>
+        <div className="section-marker">VII</div>
         <h2 className="section-title">Wildcards</h2>
         <p className="section-lede">
           Forces that could rewrite the economics of distributed flexibility. The hyperscaler
@@ -2508,6 +2696,125 @@ const CSS = `
   border-top: 1px dashed var(--rule);
   padding-top: 10px;
   margin-top: auto;
+}
+
+.adoption-wrap {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 24px 28px;
+}
+
+.adoption-header {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+}
+
+.adoption-title {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.adoption-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+.adoption-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.adoption-svg .quad-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--ink-3);
+  letter-spacing: 0.14em;
+}
+
+.adoption-svg .quad-sub {
+  font-family: var(--sans);
+  font-size: 9px;
+  fill: var(--ink-3);
+  font-style: italic;
+}
+
+.adoption-svg .axis-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.adoption-svg .point-label {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--ink);
+}
+
+.adoption-legend {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+
+.legend-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legend-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.legend-techs {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.legend-desc {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
+@media (max-width: 700px) {
+  .adoption-legend { grid-template-columns: 1fr; }
 }
 
 .ftr {
