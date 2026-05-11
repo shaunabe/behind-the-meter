@@ -833,7 +833,7 @@ export default function App() {
       <style>{CSS}</style>
 
       <header className="hdr">
-        <div className="hdr-eyebrow">A research instrument · Third Sphere</div>
+        <div className="hdr-eyebrow">Th·rd Sphere — A research instrument</div>
         <h1 className="hdr-title">
           Behind <span className="hdr-italic">the</span> Meter
         </h1>
@@ -941,6 +941,10 @@ export default function App() {
       </section>
 
       <footer className="ftr">
+        <div className="ftr-brand">
+          <span className="ftr-wordmark">Th·rd Sphere</span>
+          <span className="ftr-tagline">We forge new paths for those reimagining global systems.</span>
+        </div>
         <div className="ftr-row">
           <span>Sources include Wood Mackenzie 2025 NA VPP Market Report, DOE Liftoff: VPP 2025 Update, Pew Charitable Trusts, Latitude Media, LBNL South Africa Water Heating DSM Study (2024), Plentify research.</span>
         </div>
@@ -957,25 +961,30 @@ export default function App() {
 // ============================================================================
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --paper: #f5f1e8;
-  --paper-2: #ede7d7;
-  --ink: #1a1814;
-  --ink-2: #3a342a;
-  --ink-3: #6b6354;
-  --rule: #c9bfa6;
-  --rule-soft: #ddd4ba;
-  --accent: #b8412c;
-  --accent-2: #8b3220;
-  --gold: #a68b3e;
-  --moss: #5a6b3a;
-  --teal: #2c5560;
-  --warm: #c9863d;
-  --cool: #4a5d6b;
-  --serif: 'Fraunces', 'Georgia', serif;
-  --sans: 'Inter Tight', system-ui, sans-serif;
+  /* Backgrounds — brand: white default, light gray for panels */
+  --paper: #FFFFFF;
+  --paper-2: #F1F1F1;
+  /* Text — black with weight contrast for hierarchy (no colored text per brand) */
+  --ink: #000000;
+  --ink-2: #333333;
+  --ink-3: #767676;
+  /* Grid lines — brand spec for white backgrounds */
+  --rule: #efefef;
+  --rule-soft: #efefef;
+  /* Semantic data colors mapped to brand palette */
+  --accent: #0000E9;      /* Blue — primary brand, used for highest intensity / best fit */
+  --accent-2: #0000B5;    /* Blue darker — gradient companion */
+  --gold: #00A100;        /* Green — brand secondary, used for material/medium intensity */
+  --moss: #00A100;
+  --teal: #767676;        /* neutral gray — low signal */
+  --warm: #D90000;        /* Red — brand secondary, used sparingly for bottleneck flags */
+  --cool: #767676;
+  /* Typography — Poppins (brand Circular equivalent), keep mono for small labels */
+  --serif: 'Poppins', system-ui, sans-serif;
+  --sans: 'Poppins', system-ui, sans-serif;
   --mono: 'JetBrains Mono', monospace;
 }
 
@@ -998,8 +1007,7 @@ const CSS = `
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse at top left, rgba(168, 139, 62, 0.04), transparent 50%),
-              radial-gradient(ellipse at bottom right, rgba(184, 65, 44, 0.03), transparent 50%);
+  background: none;
   pointer-events: none;
   z-index: 0;
 }
@@ -1023,27 +1031,25 @@ const CSS = `
 
 .hdr-title {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 88px;
   line-height: 0.95;
   letter-spacing: -0.025em;
   margin: 0 0 16px;
-  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+  color: var(--ink);
 }
 
 .hdr-italic {
-  font-style: italic;
-  font-weight: 300;
-  color: var(--accent);
+  font-weight: 400;
+  color: var(--ink);
 }
 
 .hdr-sub {
   font-family: var(--serif);
   font-size: 18px;
   line-height: 1.45;
-  font-style: italic;
   color: var(--ink-2);
-  font-weight: 300;
+  font-weight: 400;
   max-width: 780px;
 }
 
@@ -1261,21 +1267,21 @@ const CSS = `
 }
 
 .section-marker {
-  font-family: var(--serif);
-  font-size: 14px;
-  font-style: italic;
-  color: var(--accent);
-  margin-bottom: 4px;
-  letter-spacing: 0.05em;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+  letter-spacing: 0.16em;
 }
 
 .section-title {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 42px;
   letter-spacing: -0.02em;
   margin: 0 0 12px;
-  font-variation-settings: 'opsz' 96, 'SOFT' 30;
+  color: var(--ink);
 }
 
 .section-lede {
@@ -1283,7 +1289,7 @@ const CSS = `
   font-size: 17px;
   line-height: 1.55;
   color: var(--ink-2);
-  font-weight: 300;
+  font-weight: 400;
   max-width: 820px;
   margin: 0 0 28px;
 }
@@ -1326,7 +1332,7 @@ const CSS = `
 .matrix th .th-sub {
   font-family: var(--serif);
   font-size: 12px;
-  font-style: italic;
+  font-style: normal;
   color: var(--ink-3);
   font-weight: 300;
   margin-top: 4px;
@@ -1391,8 +1397,8 @@ const CSS = `
   color: var(--ink-3);
 }
 
-.cell-3 .cell-label { color: var(--accent); font-weight: 500; }
-.cell-2 .cell-label { color: var(--gold); font-weight: 500; }
+.cell-3 .cell-label { color: var(--ink); font-weight: 600; }
+.cell-2 .cell-label { color: var(--ink); font-weight: 500; }
 
 .ranking-wrap {
   border: 1px solid var(--ink);
@@ -1411,7 +1417,7 @@ const CSS = `
 
 .ranking-title {
   font-family: var(--serif);
-  font-style: italic;
+  font-style: normal;
   font-size: 16px;
 }
 
@@ -1645,7 +1651,7 @@ const CSS = `
 .tech-note {
   font-family: var(--serif);
   font-size: 13px;
-  font-style: italic;
+  font-style: normal;
   color: var(--ink-2);
   line-height: 1.45;
   font-weight: 300;
@@ -1685,7 +1691,7 @@ const CSS = `
 
 .solar-history-title {
   font-family: var(--serif);
-  font-style: italic;
+  font-style: normal;
   font-size: 16px;
   color: var(--ink);
   margin-bottom: 14px;
@@ -1770,7 +1776,7 @@ const CSS = `
 .bm-desc {
   font-family: var(--serif);
   font-size: 14px;
-  font-style: italic;
+  font-style: normal;
   color: var(--ink-2);
   line-height: 1.45;
   margin-bottom: 14px;
@@ -1820,7 +1826,7 @@ const CSS = `
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--accent);
+  color: var(--warm);
   font-weight: 500;
 }
 
@@ -1939,9 +1945,9 @@ const CSS = `
   position: relative;
 }
 
-.cm-cell.maturity-mature { background: rgba(184, 65, 44, 0.18); }
-.cm-cell.maturity-emerging { background: rgba(166, 139, 62, 0.16); }
-.cm-cell.maturity-limited { background: rgba(74, 93, 107, 0.1); }
+.cm-cell.maturity-mature { background: rgba(0, 0, 233, 0.18); }
+.cm-cell.maturity-emerging { background: rgba(0, 161, 0, 0.16); }
+.cm-cell.maturity-limited { background: rgba(118, 118, 118, 0.1); }
 .cm-cell.maturity-none { background: var(--paper); }
 
 .cm-cell-label {
@@ -1952,16 +1958,16 @@ const CSS = `
   font-weight: 500;
 }
 
-.cm-cell.maturity-mature .cm-cell-label { color: var(--accent-2); }
-.cm-cell.maturity-emerging .cm-cell-label { color: var(--gold); }
-.cm-cell.maturity-limited .cm-cell-label { color: var(--cool); }
-.cm-cell.maturity-none .cm-cell-label { color: var(--rule); }
+.cm-cell.maturity-mature .cm-cell-label { color: var(--ink); }
+.cm-cell.maturity-emerging .cm-cell-label { color: var(--ink); }
+.cm-cell.maturity-limited .cm-cell-label { color: var(--ink-3); }
+.cm-cell.maturity-none .cm-cell-label { color: var(--ink-3); }
 
 .cm-note {
   padding: 14px 22px;
   font-family: var(--serif);
   font-size: 13px;
-  font-style: italic;
+  font-style: normal;
   color: var(--ink-2);
   background: var(--paper-2);
   border-top: 1px solid var(--ink);
@@ -2056,6 +2062,32 @@ const CSS = `
   border-top: 1px solid var(--ink);
   margin-top: 80px;
   padding-top: 20px;
+}
+
+.ftr-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ftr-wordmark {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.ftr-tagline {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-2);
+  line-height: 1.4;
 }
 
 .ftr-row {
