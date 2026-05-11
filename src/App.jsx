@@ -1333,10 +1333,6 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
 
   // For label positioning at the right edge — stagger to reduce collision
   const sortedByEnd = [...techData].sort((a, b) => b.points[b.points.length - 1] - a.points[a.points.length - 1]);
-  const labelY = (idx, raw) => {
-    // Bias labels apart vertically when endpoints are close
-    return yPos(raw);
-  };
 
   // Y-axis tick values
   const yTicks = [0, 25, 50, 75, 100];
@@ -1355,7 +1351,7 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
         {/* Y-axis gridlines */}
         {yTicks.map((t) => (
           <g key={t}>
-            <line x1={PAD_L} y1={yPos(t)} x2={PAD_L + plotW} y2={yPos(t)} stroke="var(--rule)" strokeWidth="1" strokeDasharray={t === 0 ? '' : '2 3'} />
+            <line x1={PAD_L} y1={yPos(t)} x2={PAD_L + plotW} y2={yPos(t)} stroke="var(--rule)" strokeWidth="1" strokeDasharray={t === 0 ? undefined : '2 3'} />
             <text x={PAD_L - 10} y={yPos(t) + 4} className="timeline-axis-tick" textAnchor="end">{t}%</text>
           </g>
         ))}
@@ -1383,7 +1379,7 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
                 fill="none"
                 stroke={color}
                 strokeWidth={isPortfolio ? 2.5 : 1.5}
-                strokeDasharray={isPortfolio ? '' : '4 3'}
+                strokeDasharray={isPortfolio ? undefined : '4 3'}
                 opacity={0.9}
               />
               {points.map((p, i) => (
