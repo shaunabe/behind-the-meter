@@ -132,6 +132,146 @@ const REASON_LABELS = {
   identity: { name: 'Identity / Climate', desc: 'Decarbonization, signaling, ESG' },
 };
 
+// Market scale — addressable base, current penetration, and 2030 projection per
+// technology × geography. Order-of-magnitude estimates intended to indicate scale,
+// not predict it precisely. Anchored to public sources (EIA, IEA, DOE Liftoff,
+// BNEF, Wood Mackenzie, LBNL, ISO-NE, NYC LL97 data, NYSERDA, Plentify research).
+const MARKET_SCALE = {
+  water_heater: {
+    headline: 'Largest leverage in markets with electric resistance heating + peak constraints',
+    geos: {
+      US: '~50M electric water heaters (EIA). <5% in any DR/VPP program today. 2030 flex potential: ~5–10 GW dispatchable if utility programs scale.',
+      EU: '~30M, but Europe is shifting to heat-pump water heaters under EU ecodesign; flex value narrower outside cold-climate hot-water-only use.',
+      LATAM: '~20M+ urban, mostly uncontrolled tank. Niche today outside Brazil and Chile pilots.',
+      SA: '~6M electric geysers — 33% of residential consumption and 35% of evening peak (LBNL 2024 South Africa Water Heating DSM Study). Plentify targeting 1M+ devices by 2030. The canonical case.',
+      IN: '~30M+ urban geysers, growing fast with middle-class formation. Peak-tariff dynamics rising; flex monetization still early.',
+    },
+    sources: [
+      { label: 'LBNL South Africa Water Heating DSM Study (2024)', url: 'https://emp.lbl.gov/publications' },
+      { label: 'EIA Residential Energy Consumption Survey', url: 'https://www.eia.gov/consumption/residential/' },
+      { label: 'DOE Liftoff: VPP — water heater chapter', url: 'https://liftoff.energy.gov/vpp/' },
+    ],
+  },
+  hybrid_electrification: {
+    headline: 'Dense-urban multifamily with steam/gas heating + decarb mandates',
+    geos: {
+      US: 'NYC alone: ~1M multifamily units in ~50k buildings; 75% of NYC buildings use steam. LL97 directly covers ~50k properties >25k sq ft. Wider Northeast + Mid-Atlantic adds another ~3–5M units. Kelvin addressable market: tens of billions in retrofits by 2030.',
+      EU: 'UK has ~10M radiator-heated homes (mostly gas combi); Germany ~25M, with central boilers. Hybrid retrofits emerging via utility programs and SAP/BREL incentives.',
+      LATAM: 'Limited central steam/hydronic stock; AC-led market. Negligible near-term.',
+      SA: 'Very limited steam infrastructure; gas heating uncommon outside industrial.',
+      IN: 'Limited centralized heating outside cold-climate north (Punjab, J&K, parts of Himachal); negligible near-term opportunity.',
+    },
+    sources: [
+      { label: 'NYC LL97 Building Emissions Law', url: 'https://www.nyc.gov/site/sustainability/our-programs/local-law-97.page' },
+      { label: 'NYSERDA Multifamily Retrofit Programs', url: 'https://www.nyserda.ny.gov/' },
+      { label: 'ACEEE Hybrid Heating Research', url: 'https://www.aceee.org/' },
+    ],
+  },
+  heat_pump: {
+    headline: 'Mainstream in cold-climate developed economies; install capacity is the constraint',
+    geos: {
+      US: '~17M heat-pump-heated homes today (~20% of single-family). IEA WEO 2025: ~40% of US space heating from heat pumps by 2035, implying ~50M+ installed units. US sales fell ~13% in 2025 on refrigerant transition but still outsold gas furnaces for 4th straight year.',
+      EU: '~25M cumulative installed; EU REPowerEU target of 60M by 2030. Germany flipped to HP > gas boilers for first time in 2025. Annual sales ~3M+.',
+      LATAM: '~1M cumulative; mostly reversible AC in Chile, Brazil, Mexico used as HP. Growing but still niche for primary heating.',
+      SA: '~150k installed; growing but small relative to geyser opportunity.',
+      IN: '~30M+ reversible AC units (effectively HP capacity for cooling); heating use minor outside cold-climate north.',
+    },
+    sources: [
+      { label: 'IEA World Energy Outlook 2025 — Heat Pumps', url: 'https://www.iea.org/reports/world-energy-outlook-2025' },
+      { label: 'IEA The Future of Heat Pumps', url: 'https://www.iea.org/reports/the-future-of-heat-pumps' },
+      { label: 'EHPA European Heat Pump Market Report', url: 'https://www.ehpa.org/data/market-data/' },
+    ],
+  },
+  smart_thermostat: {
+    headline: 'Incumbent VPP enrollment — 61% of US VPP deployments include thermostats',
+    geos: {
+      US: '~50M installed of ~85M HVAC-equipped homes; ~10M in active utility DR/VPP programs. Wood Mackenzie projects ~70M installed by 2030.',
+      EU: '~15M; lower HVAC central penetration but smart-home growth strong, especially UK and Germany.',
+      LATAM: 'Niche to urban affluent segment; ~1–2M installed.',
+      SA: '~200–500k installed; underdeveloped market.',
+      IN: 'Growing rapidly with split-AC adoption; ~3–5M smart-AC controllers installed.',
+    },
+    sources: [
+      { label: 'Wood Mackenzie US Demand Response & VPP Market', url: 'https://www.woodmac.com/research/products/power-and-renewables/' },
+      { label: 'DOE VPP Liftoff Report', url: 'https://liftoff.energy.gov/vpp/' },
+    ],
+  },
+  battery: {
+    headline: 'Highest flex per unit; economics dominated by rate design + resilience demand',
+    geos: {
+      US: '~700k residential systems installed (2024); BNEF projects ~1M+ added annually by 2027. Total residential capacity ~7 GW. ~3 GW commercial/industrial BTM.',
+      EU: '~2M residential batteries; Germany ~1.5M alone. Italy, UK accelerating.',
+      LATAM: 'Small (~100k residential); load-shedding-driven growth in Argentina, Mexico, parts of Brazil.',
+      SA: '~150k+ residential battery installations during load-shedding peak (2023). Growing despite reduced load-shedding pressure.',
+      IN: 'Small (<50k residential); commercial BTM growing for solar self-consumption.',
+    },
+    sources: [
+      { label: 'BNEF Energy Storage Market Outlook', url: 'https://about.bnef.com/insights/clean-energy/energy-storage/' },
+      { label: 'Wood Mackenzie US Energy Storage Monitor', url: 'https://www.woodmac.com/research/products/power-and-renewables/us-energy-storage-monitor/' },
+      { label: 'SolarPower Europe Battery Storage Outlook', url: 'https://www.solarpowereurope.org/' },
+    ],
+  },
+  leak_thermal: {
+    headline: 'Loss-prevention play with insurance-funded growth potential',
+    geos: {
+      US: '~150M home insurance policies; <10M leak sensors installed. Commercial refrigeration ~4M asset-locations addressable (Glacier Grid territory).',
+      EU: '~70M insured properties; growing leak-detection adoption, especially UK and Nordics.',
+      LATAM: 'Commercial cold-chain primary opportunity; consumer adoption still light.',
+      SA: 'Small but growing; insurance-funded resilience expanding.',
+      IN: 'Commercial cold-chain large opportunity (vaccine + food supply chains); consumer adoption nascent.',
+    },
+    sources: [
+      { label: 'Swiss Re Institute Climate Risk Reports', url: 'https://www.swissre.com/institute/' },
+      { label: 'Insurance Information Institute', url: 'https://www.iii.org/' },
+      { label: 'IEA Cold Chain Energy Demand', url: 'https://www.iea.org/' },
+    ],
+  },
+  aggregation: {
+    headline: 'The orchestration layer; capital following deployment',
+    geos: {
+      US: '30–60 GW VPP capacity today (DOE Liftoff). 2030 target: 80–160 GW (10–20% of peak). Renew Home alone targeting 50 GW residential VPP.',
+      EU: 'Statkraft VPP 10 GW; Next Kraftwerke 10 GW; significant growth via Germany, UK, France market reforms.',
+      LATAM: 'Limited near-term aggregation; some pilots in Brazil and Chile.',
+      SA: 'Small but growing; Plentify-led aggregation pilots; no formal wholesale DR market yet.',
+      IN: 'Early-stage; ~1 GW DR capacity. Wholesale market reforms expected mid-decade.',
+    },
+    sources: [
+      { label: 'DOE Liftoff: VPP', url: 'https://liftoff.energy.gov/vpp/' },
+      { label: 'Wood Mackenzie North America VPP Market Outlook', url: 'https://www.woodmac.com/' },
+      { label: 'FERC Order 2222 Implementation Tracker', url: 'https://www.ferc.gov/' },
+    ],
+  },
+  ev: {
+    headline: 'Largest single load addition — but mobility-constrained dispatchability',
+    geos: {
+      US: '~4M EVs on road; DOE projects 20–90 GW of EV demand capacity additions by 2030. EV batteries: 300–540 GWh aggregate by 2030. V2G mainstreaming 2026–2028.',
+      EU: '~12M EVs; Europe leads V2G regulatory push (UK G99, ISO 15118-20 deployment). 30–50 GW EV flex by 2030.',
+      LATAM: '~500k EVs; small but growing 50%+ annually in Brazil/Mexico.',
+      SA: '~30k EVs; minor near-term BTM contribution.',
+      IN: '~5M EVs (mostly 2W/3W); different flex shape — small but numerous batteries, swap-based ecosystem.',
+    },
+    sources: [
+      { label: 'BNEF Electric Vehicle Outlook', url: 'https://about.bnef.com/insights/clean-transport/electric-vehicle-outlook/' },
+      { label: 'DOE Liftoff: VPP — EV chapter', url: 'https://liftoff.energy.gov/vpp/' },
+      { label: 'IEA Global EV Outlook', url: 'https://www.iea.org/reports/global-ev-outlook-2025' },
+    ],
+  },
+  smart_panel: {
+    headline: 'The home OS — unlocks heat pump + EV + battery without service upgrade',
+    geos: {
+      US: '~130M residential service panels; smart-panel installed base <1M but growing fast under IRA + electrification mandates. SPAN, Lumin, others scaling.',
+      EU: 'Lower addressable (panel-constraint problem less acute; service amperage already higher).',
+      LATAM: 'Niche; emerging.',
+      SA: 'Limited; service-amperage similar to EU.',
+      IN: 'Limited central-panel architecture; smart-meter-led approach more common.',
+    },
+    sources: [
+      { label: 'RMI Smart Panel Market Brief', url: 'https://rmi.org/' },
+      { label: 'DOE Building Technologies Office', url: 'https://www.energy.gov/eere/buildings/' },
+    ],
+  },
+};
+
 const TECHNOLOGIES = [
   {
     id: 'water_heater',
@@ -812,6 +952,15 @@ function TechGrid({ geo, horizon, sliders }) {
                 ))}
               </div>
             </div>
+            {MARKET_SCALE[t.id] && (
+              <div className="tech-scale">
+                <div className="scale-head">
+                  <span className="scale-label">Market scale · {geo}</span>
+                  <span className="scale-headline">{MARKET_SCALE[t.id].headline}</span>
+                </div>
+                <div className="scale-body">{MARKET_SCALE[t.id].geos[geo]}</div>
+              </div>
+            )}
             <div className="tech-note">{t.note}</div>
             {t.portfolio !== '—' && (
               <div className="tech-portfolio" title={t.portfolio}>
@@ -1893,6 +2042,44 @@ const CSS = `
   color: var(--ink-2);
   line-height: 1.45;
   font-weight: 300;
+}
+
+.tech-scale {
+  background: var(--paper-2);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scale-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scale-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.scale-headline {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.scale-body {
+  font-family: var(--sans);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-2);
 }
 
 .tech-portfolio {
