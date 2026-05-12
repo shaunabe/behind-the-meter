@@ -242,19 +242,19 @@ const MARKET_SCALE = {
     ],
   },
   emissions_sensing: {
-    headline: 'Compliance-driven — LL97 / BPS in US, EPBD in EU set the cadence',
+    headline: 'Paced by heat pump install volume + refrigerant rule tightening',
     geos: {
-      US: 'NYC LL97 directly covers ~50k properties >25k sq ft, with $268/MT-CO2 fines starting 2024 ratcheting through 2030 + 2040. BPS spreading to Boston, DC, Seattle, Denver, Chicago — combined addressable ~500k commercial/multifamily properties by 2030. EPA AIM Act tightens refrigerant-leak rules in parallel. Onsite DAC nascent; sensing + leak detection is the immediate wedge.',
-      EU: 'EU EPBD revision (2024) mandates emissions disclosure for non-residential >250m² by 2028, all buildings by 2030. F-gas regulation 2024 phases down high-GWP refrigerants. ~5M commercial buildings + ~25M apartment blocks addressable. UK MEES, Germany GEG add national-level pressure.',
-      LATAM: 'Limited regulatory framework; some city-level pilots in Mexico City and São Paulo. Voluntary corporate net-zero is the near-term driver.',
-      SA: 'Negligible regulatory pressure; voluntary corporate ESG only. Small near-term opportunity.',
-      IN: 'Emerging BEE (Bureau of Energy Efficiency) commercial building standards; corporate net-zero in IT/financial real estate. Small but growing.',
+      US: '~85M HVAC-equipped homes + ~5M commercial buildings. US heat pumps outsold gas furnaces for 4th straight year in 2025; IEA WEO 2025 projects ~50M+ HP installed by 2035. A2L refrigerant transition (2025) created widespread commissioning pain. EPA AIM Act phases down high-GWP refrigerants and tightens leak rules. Sidekick addressable: every refrigerant-based system installed, monitored, or serviced.',
+      EU: '~25M heat pumps cumulative; EU REPowerEU target of 60M by 2030 means ~35M new installs in 5 years. EU F-gas Regulation 2024 phases down high-GWP refrigerants and tightens leak reporting. Major contractor-channel build-out underway.',
+      LATAM: '~30M AC units + growing reversible-AC base. Cold-chain commercial channel sizable in Brazil, Mexico, Chile. Contractor sophistication varies; longer adoption tail.',
+      SA: 'Smaller installed base (~150k HPs + ~5M AC) but growing. Contractor channel underdeveloped.',
+      IN: '~30M reversible AC units in residential + large commercial cold chain. Massive addressable but contractor-channel-driven and fragmented.',
     },
     sources: [
-      { label: 'NYC LL97 Compliance Reports', url: 'https://www.nyc.gov/site/sustainability/our-programs/local-law-97.page' },
-      { label: 'EU EPBD Revision 2024', url: 'https://energy.ec.europa.eu/topics/energy-efficiency/energy-efficient-buildings/energy-performance-buildings-directive_en' },
+      { label: 'IEA WEO 2025 — Heat Pumps', url: 'https://www.iea.org/reports/world-energy-outlook-2025' },
       { label: 'EPA AIM Act (Refrigerant Phase-Down)', url: 'https://www.epa.gov/climate-hfcs-reduction' },
-      { label: 'DOE Building Performance Standards Coalition', url: 'https://www.energy.gov/scep/building-performance-standards-coalition' },
+      { label: 'EU F-gas Regulation 2024', url: 'https://climate.ec.europa.eu/eu-action/fluorinated-greenhouse-gases_en' },
+      { label: 'EHPA European Heat Pump Market Data', url: 'https://www.ehpa.org/data/market-data/' },
     ],
   },
   aggregation: {
@@ -312,6 +312,24 @@ const MARKET_SCALE = {
 //   2. EU summer cooling surge — bumps EU heat pump (heating + cooling), smart
 //      thermostat (managing AC load), and battery (PV self-consumption in heatwaves).
 const ADOPTION_TIMELINE_YEARS = [2020, 2025, 2030, 2035];
+
+// Per-tech visual style for the timeline — distinct color + line style for each
+// of the 11 techs so they're scannable at a glance. Portfolio-represented techs
+// use solid lines in distinct brand-aligned hues; non-portfolio techs use
+// darker/repeated hues with varied dash patterns. Same palette feeds the legend.
+const TECH_STYLE = {
+  water_heater:           { color: '#0000E9', dash: undefined,       width: 2.5 }, // Blue solid — Plentify
+  hybrid_electrification: { color: '#0080FF', dash: undefined,       width: 2.5 }, // Azure solid — Kelvin
+  heat_pump:              { color: '#00A100', dash: undefined,       width: 2.5 }, // Green solid — Gradient
+  commercial_heat:        { color: '#F05A00', dash: undefined,       width: 2.5 }, // Orange solid — Focal
+  smart_thermostat:       { color: '#8000FF', dash: undefined,       width: 2.5 }, // Purple solid — Flair
+  leak_thermal:           { color: '#E900E9', dash: undefined,       width: 2.5 }, // Magenta solid — Glacier Grid
+  emissions_sensing:      { color: '#D90000', dash: undefined,       width: 2.5 }, // Red solid — Thalo
+  battery:                { color: '#0000B5', dash: '7 4',           width: 2.0 }, // Dark blue dashed
+  aggregation:            { color: '#000000', dash: '2 3',           width: 2.0 }, // Black dotted
+  ev:                     { color: '#404040', dash: '8 3 2 3',       width: 2.0 }, // Dark gray dash-dot
+  smart_panel:            { color: '#004D00', dash: '7 4',           width: 2.0 }, // Dark green dashed
+};
 const ADOPTION_TIMELINE = {
   water_heater: {
     unit: '% of electric water heaters controlled',
@@ -370,12 +388,12 @@ const ADOPTION_TIMELINE = {
     IN: [0.3, 0.5, 2, 5],
   },
   emissions_sensing: {
-    unit: '% of compliance-covered buildings with emissions sensing/capture',
-    US: [0, 1, 12, 35],
-    EU: [0, 1, 8, 28],
-    LATAM: [0, 0.1, 1, 4],
-    SA: [0, 0, 0.5, 2],
-    IN: [0, 0.1, 1, 4],
+    unit: '% of refrigerant-based HVAC systems with monitoring',
+    US: [0, 1, 8, 22],
+    EU: [0, 1, 7, 20],
+    LATAM: [0, 0.2, 2, 6],
+    SA: [0, 0.1, 1, 3],
+    IN: [0, 0.2, 2, 6],
   },
   aggregation: {
     unit: '% of peak addressable via VPP / DER aggregation',
@@ -539,22 +557,22 @@ const TECHNOLOGIES = [
   },
   {
     id: 'emissions_sensing',
-    name: 'Building Emissions Sensing & Capture',
+    name: 'HVAC + Refrigerant Asset Intelligence',
     icon: '⌬',
-    capex_score: 3,
-    capex_usd: '$2k–25k/building (sensors); DAC unit pricing project-specific',
-    lifespan: '10–15y',
-    dispatchability: 1,
-    flexibility: 1,
+    capex_score: 4,
+    capex_usd: '$200–1,500/unit + subscription',
+    lifespan: '7–12y',
+    dispatchability: 0,
+    flexibility: 0,
     resilience: 1,
-    install_friction: 2,
-    margin_potential: 4,
-    value_stack: ['LL97 / BPS compliance', 'Methane leak detection', 'Refrigerant management', 'HVAC commissioning + monitoring', 'Onsite DAC + scope-1 capture'],
-    portfolio: 'Thalo Labs (sensing + analytics + modular DAC; Newark Terminal B flagship)',
-    note: 'Not a grid-flex play — a compliance + measurement + capture play. Same customer set as Kelvin (LL97-covered multifamily + commercial), complementary value stack: Kelvin reduces emissions via smart controls and partial electrification; Thalo measures, leak-detects, and captures the residual. Three product layers — sensing platform (real-time greenhouse gas measurement at boilers, refrigerant systems), capture (modular Direct Air Capture units, Newark Liberty Terminal B is the flagship), and Sidekick predictive HVAC intelligence (cellular-connected sensors for refrigerant-based systems, sensor-verified commissioning). Methane leaks alone account for ~25% of NYC building emissions; sensing-led reduction has the fastest payback under $268/MT-CO2 fines. DAC unit economics still emerging — capture is the long-game offering, sensing is the near-term wedge.',
-    geo_fit: { US: 3, EU: 3, LATAM: 1, SA: 1, IN: 1 },
-    primary_driver: ['identity', 'capex'],
-    secondary_driver: ['bills', 'comfort'],
+    install_friction: 1,
+    margin_potential: 5,
+    value_stack: ['Refrigerant leak prevention', 'Sensor-verified commissioning', 'Heat pump performance monitoring', 'Avoided callbacks / warranty leakage', 'AIM Act / F-gas compliance'],
+    portfolio: 'Thalo Labs (Sidekick — cellular HVAC monitoring for contractors)',
+    note: 'Operational complement to the electrification thesis, not a grid-flex play. As heat pump install volumes scale (US already outsold gas furnaces 4 years running per IEA), commissioning quality and refrigerant management become the bottleneck — nearly 1-in-4 installs require a return visit, mostly for refrigerant charge issues and improper commissioning. Thalo\u2019s Sidekick sits non-invasively inside refrigerant-based systems (heat pumps, AC, VRF), connects via cellular (no Wi-Fi), and gives contractors three things: sensor-verified commissioning at install, 24/7 monitoring with predictive failure alerts, and remote diagnosis to dispatch the right technician with the right parts first time. Reactive repair costs 3–5× proactive; one NYC affordable-housing case study used Sidekick to diagnose 9 failing VRF heat pumps remotely before any truck rolled.',
+    geo_fit: { US: 3, EU: 3, LATAM: 2, SA: 1, IN: 2 },
+    primary_driver: ['capex', 'bills'],
+    secondary_driver: ['comfort', 'identity'],
   },
   {
     id: 'aggregation',
@@ -1326,16 +1344,16 @@ function AdoptionMap({ geo, horizon, sliders }) {
 }
 
 function AdoptionTimeline({ geo, horizon, sliders }) {
-  // Color each line by where the tech currently sits in cost-value space
-  // — connects this view to the Adoption Map directly.
+  // Per-tech color + line style assigned in TECH_STYLE; not tied to current
+  // cost-value quadrant — that's the Adoption Map's job. Here each tech is
+  // visually distinct so trajectories can be compared at a glance.
   const techData = useMemo(() => {
     return TECHNOLOGIES.map((t) => {
       const series = ADOPTION_TIMELINE[t.id];
       if (!series || !series[geo]) return null;
-      const { cost, value } = computeCostValue(t, geo, horizon, sliders);
-      return { tech: t, points: series[geo], unit: series.unit, quadrant: adoptionQuadrant(cost, value).id };
+      return { tech: t, points: series[geo], unit: series.unit };
     }).filter(Boolean);
-  }, [geo, horizon, sliders]);
+  }, [geo]);
 
   const W = 800;
   const H = 460;
@@ -1351,13 +1369,6 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
   const xPos = (yr) => PAD_L + ((yr - yearMin) / (yearMax - yearMin)) * plotW;
   const yPos = (pct) => PAD_T + (1 - Math.min(pct, 100) / 100) * plotH;
 
-  const quadrantColor = {
-    pull: 'var(--accent)',
-    mandate: 'var(--gold)',
-    addon: 'var(--ink-3)',
-    stranded: 'var(--warm)',
-  };
-
   // Short labels (same mapping as the cost-value map)
   const shortName = (n) => n
     .replace('Smart Electric Water Heater', 'Water Heater')
@@ -1366,7 +1377,8 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
     .replace('Commercial / Outdoor Electric Heat', 'Commercial Heat')
     .replace('Smart Thermostat / HVAC Controls', 'Thermostat')
     .replace('Stationary Battery (Home/SMB)', 'Battery')
-    .replace('Leak / Cold-Chain / Asset Sensors', 'Sensors')
+    .replace('Leak / Cold-Chain / Asset Sensors', 'Leak Sensors')
+    .replace('HVAC + Refrigerant Asset Intelligence', 'HVAC Intel')
     .replace('Aggregation / VPP Software', 'Aggregation')
     .replace('EV / V2G / Managed Charging', 'EV / V2G')
     .replace('Smart Electrical Panel', 'Smart Panel');
@@ -1384,7 +1396,7 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
     <div className="timeline-wrap">
       <div className="timeline-header">
         <div className="timeline-title">Adoption trajectories · {geo}</div>
-        <div className="timeline-sub">% penetration of addressable base · line color matches Adoption Map quadrant</div>
+        <div className="timeline-sub">% penetration of addressable base · each tech has a distinct color + line style</div>
       </div>
 
       <svg viewBox={`0 0 ${W} ${H}`} className="timeline-svg" preserveAspectRatio="xMidYMid meet">
@@ -1411,40 +1423,43 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
         {/* Axis labels */}
         <text x={20} y={PAD_T + plotH / 2} className="timeline-axis-label" textAnchor="middle" transform={`rotate(-90 20 ${PAD_T + plotH / 2})`}>PENETRATION %</text>
 
-        {/* Lines per tech */}
-        {techData.map(({ tech, points, quadrant }) => {
-          const isPortfolio = tech.portfolio && tech.portfolio !== '\u2014';
-          const color = quadrantColor[quadrant];
+        {/* Lines per tech — per-tech color + dash from TECH_STYLE */}
+        {techData.map(({ tech, points }) => {
+          const style = TECH_STYLE[tech.id] || { color: 'var(--ink)', width: 1.5 };
           return (
             <g key={tech.id}>
               <path
                 d={pathFor(points)}
                 fill="none"
-                stroke={color}
-                strokeWidth={isPortfolio ? 2.5 : 1.5}
-                strokeDasharray={isPortfolio ? undefined : '4 3'}
-                opacity={0.9}
+                stroke={style.color}
+                strokeWidth={style.width}
+                strokeDasharray={style.dash}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={0.92}
               />
               {points.map((p, i) => (
-                <circle key={i} cx={xPos(years[i])} cy={yPos(p)} r="3" fill={color} stroke="var(--paper)" strokeWidth="1.5" />
+                <circle key={i} cx={xPos(years[i])} cy={yPos(p)} r="3" fill={style.color} stroke="var(--paper)" strokeWidth="1.5" />
               ))}
             </g>
           );
         })}
       </svg>
 
-      {/* Legend with endpoint values, sorted by 2035 endpoint descending */}
+      {/* Legend — sorted by 2035 endpoint descending, swatch shows actual color + dash */}
       <div className="timeline-legend">
-        {sortedByEnd.map(({ tech, points, quadrant }) => {
+        {sortedByEnd.map(({ tech, points }) => {
+          const style = TECH_STYLE[tech.id] || { color: 'var(--ink)' };
           const isPortfolio = tech.portfolio && tech.portfolio !== '\u2014';
-          const color = quadrantColor[quadrant];
           const start = points[0];
           const end = points[points.length - 1];
           const growth = start > 0 ? ((end / start - 1) * 100) : null;
           return (
             <div key={tech.id} className="tl-legend-row">
-              <span className="tl-legend-swatch" style={{ background: color, borderStyle: isPortfolio ? 'solid' : 'dashed', borderColor: color }} />
-              <span className="tl-legend-name">{shortName(tech.name)}{isPortfolio ? ' ·' : ''}</span>
+              <svg width="28" height="10" viewBox="0 0 28 10" className="tl-legend-swatch-svg" aria-hidden="true">
+                <line x1="0" y1="5" x2="28" y2="5" stroke={style.color} strokeWidth="2.5" strokeDasharray={style.dash} strokeLinecap="round" />
+              </svg>
+              <span className="tl-legend-name">{shortName(tech.name)}{isPortfolio ? ' \u00b7' : ''}</span>
               <span className="tl-legend-end">{end}%</span>
               <span className="tl-legend-delta">{start > 0 && growth !== null ? `${growth >= 1000 ? '\u003e10\u00d7' : growth >= 100 ? Math.round(growth / 100) + '\u00d7' : '+' + Math.round(growth) + '%'} from ${start}%` : 'from \u2014'}</span>
             </div>
@@ -1654,6 +1669,21 @@ export default function App() {
 
       <section className="section">
         <div className="section-marker">I</div>
+        <h2 className="section-title">Adoption over time</h2>
+        <p className="section-lede">
+          The headline view. Penetration of addressable base by year, by geography. Each technology
+          has its own color and line style so trajectories are easy to compare at a glance. Solid
+          lines mark portfolio-represented technologies. Trajectories embed two macro forces — the
+          AI/datacenter capacity crunch (pulling aggregation and battery curves higher in markets
+          with active wholesale plus hyperscaler co-funding) and the EU summer cooling surge
+          (accelerating EU heat pump, thermostat, and battery curves as buildings designed for cold
+          need to handle 40°C summers).
+        </p>
+        <AdoptionTimeline geo={geo} horizon={horizon} sliders={sliders} />
+      </section>
+
+      <section className="section">
+        <div className="section-marker">II</div>
         <h2 className="section-title">Why people buy</h2>
         <p className="section-lede">
           Customer types and the reasons that move them. Resilience and identity grow over time;
@@ -1664,7 +1694,7 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">II</div>
+        <div className="section-marker">III</div>
         <h2 className="section-title">Live technology ranking</h2>
         <p className="section-lede">
           Drag the sliders and watch the order shift. Score combines geographic fit, demand pull
@@ -1675,17 +1705,17 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">III</div>
+        <div className="section-marker">IV</div>
         <h2 className="section-title">Technology comparison</h2>
         <p className="section-lede">
-          Same eight technology classes, expanded view. Card order matches the ranking. Geographic
+          Same eleven technology classes, expanded view. Card order matches the ranking. Geographic
           fit is fixed per region; the score reflects current slider conditions.
         </p>
         <TechGrid geo={geo} horizon={horizon} sliders={sliders} />
       </section>
 
       <section className="section">
-        <div className="section-marker">IV</div>
+        <div className="section-marker">V</div>
         <h2 className="section-title">Adoption map · cost vs received value</h2>
         <p className="section-lede">
           Adoption ultimately falls along cost vs value. Each technology is placed by relative cost
@@ -1696,21 +1726,6 @@ export default function App() {
           reset.
         </p>
         <AdoptionMap geo={geo} horizon={horizon} sliders={sliders} />
-      </section>
-
-      <section className="section">
-        <div className="section-marker">V</div>
-        <h2 className="section-title">Adoption over time</h2>
-        <p className="section-lede">
-          From snapshot to trajectory. Penetration of addressable base by year, by geography. Line
-          color matches the cost-value quadrant each tech currently occupies; solid lines are
-          portfolio-represented technologies, dashed are adjacent categories. Trajectories embed
-          two macro forces — the AI/datacenter capacity crunch (pulling aggregation and battery
-          curves higher in markets with active wholesale plus hyperscaler co-funding) and the EU
-          summer cooling surge (accelerating EU heat pump, thermostat, and battery curves as
-          buildings designed for cold need to handle 40°C summers).
-        </p>
-        <AdoptionTimeline geo={geo} horizon={horizon} sliders={sliders} />
       </section>
 
       <section className="section">
@@ -3168,18 +3183,18 @@ const CSS = `
 
 .tl-legend-row {
   display: grid;
-  grid-template-columns: 16px 1fr auto auto;
+  grid-template-columns: 30px 1fr auto auto;
   align-items: center;
   gap: 8px;
   font-family: var(--sans);
   font-size: 11px;
 }
 
-.tl-legend-swatch {
-  width: 14px;
-  height: 3px;
-  border: 1px solid;
-  border-style: solid;
+.tl-legend-swatch-svg {
+  width: 28px;
+  height: 10px;
+  flex-shrink: 0;
+  display: block;
 }
 
 .tl-legend-name {
@@ -3212,7 +3227,7 @@ const CSS = `
 
 @media (max-width: 700px) {
   .timeline-legend { grid-template-columns: 1fr; }
-  .tl-legend-row { grid-template-columns: 16px 1fr auto; }
+  .tl-legend-row { grid-template-columns: 30px 1fr auto; }
   .tl-legend-delta { display: none; }
 }
 
