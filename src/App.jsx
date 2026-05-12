@@ -1287,7 +1287,8 @@ function AdoptionMap({ geo, horizon, sliders }) {
     .replace('Commercial / Outdoor Electric Heat', 'Commercial Heat')
     .replace('Smart Thermostat / HVAC Controls', 'Thermostat')
     .replace('Stationary Battery (Home/SMB)', 'Battery')
-    .replace('Leak / Cold-Chain / Asset Sensors', 'Sensors')
+    .replace('Leak / Cold-Chain / Asset Sensors', 'Leak Sensors')
+    .replace('HVAC + Refrigerant Asset Intelligence', 'HVAC Intel')
     .replace('Aggregation / VPP Software', 'Aggregation')
     .replace('EV / V2G / Managed Charging', 'EV / V2G')
     .replace('Smart Electrical Panel', 'Smart Panel');
@@ -1300,13 +1301,37 @@ function AdoptionMap({ geo, horizon, sliders }) {
     stranded: 'var(--warm)',     // Red — won't move
   };
 
-  // Label offset jitter to reduce collisions (deterministic by tech id hash)
-  const labelOffset = (id, value) => {
-    const h = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-    const dx = (h % 3) * 6 + 10;
-    const dy = value > 75 ? 18 : -8;
-    return { dx, dy };
-  };
+  // Compute label position per point. Two passes:
+  //   1. Anchor labels on the opposite side of the dot from the plot edge,
+  //      so right-side dots get text-anchor='end' and labels extend leftward
+  //      (prevents off-screen clipping that was previously cutting 'Heat Pump').
+  //   2. Greedy vertical-collision pass: walk points grouped by anchor side,
+  //      sorted by y. If a label would sit within MIN_DY of the previous one,
+  //      nudge it downward and remember the dot's original y for a leader line.
+  const labelInfo = useMemo(() => {
+    const MIN_DY = 18;
+    const items = points.map(p => ({
+      ...p,
+      px: x(p.cost),
+      py: y(p.value),
+      anchor: p.cost > 55 ? 'end' : 'start',
+    }));
+    items.forEach(it => {
+      it.lx = it.px + (it.anchor === 'end' ? -12 : 12);
+    });
+    // Two passes — one per side
+    ['start', 'end'].forEach(side => {
+      const group = items.filter(it => it.anchor === side).sort((a, b) => a.py - b.py);
+      let lastLy = -Infinity;
+      group.forEach(it => {
+        let ly = it.py + 4; // 4px = baseline offset so label aligns with dot
+        if (ly - lastLy < MIN_DY) ly = lastLy + MIN_DY;
+        it.ly = ly;
+        lastLy = ly;
+      });
+    });
+    return items;
+  }, [points]);
 
   return (
     <div className="adoption-wrap">
@@ -1344,17 +1369,26 @@ function AdoptionMap({ geo, horizon, sliders }) {
         <text x={PAD_L + plotW / 2} y={H - 20} className="axis-label" textAnchor="middle">RELATIVE COST · capex + install friction →</text>
         <text x={20} y={PAD_T + plotH / 2} className="axis-label" textAnchor="middle" transform={`rotate(-90 20 ${PAD_T + plotH / 2})`}>RECEIVED VALUE · demand pull + flex/resilience →</text>
 
-        {/* Plot points */}
-        {points.map(({ tech, cost, value, quadrant }) => {
-          const cx = x(cost);
-          const cy = y(value);
-          const { dx, dy } = labelOffset(tech.id, value);
-          const color = quadrantColor[quadrant.id];
+        {/* Plot points with collision-avoiding labels + leader lines */}
+        {labelInfo.map((item) => {
+          const color = quadrantColor[item.quadrant.id];
+          const labelDriftedSignificantly = Math.abs((item.ly - 4) - item.py) > 6;
           return (
-            <g key={tech.id}>
-              <circle cx={cx} cy={cy} r="6" fill={color} stroke="var(--paper)" strokeWidth="2" />
-              <text x={cx + dx} y={cy + dy} className="point-label" fill="var(--ink)">
-                {shortName(tech.name)}
+            <g key={item.tech.id}>
+              {labelDriftedSignificantly && (
+                <line
+                  x1={item.px}
+                  y1={item.py}
+                  x2={item.lx + (item.anchor === 'end' ? 2 : -2)}
+                  y2={item.ly - 4}
+                  stroke={color}
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
+              )}
+              <circle cx={item.px} cy={item.py} r="6" fill={color} stroke="var(--paper)" strokeWidth="2" />
+              <text x={item.lx} y={item.ly} className="point-label" textAnchor={item.anchor} fill="var(--ink)">
+                {shortName(item.tech.name)}
               </text>
             </g>
           );
@@ -1735,6 +1769,21 @@ export default function App() {
 
       <section className="section">
         <div className="section-marker">II</div>
+        <h2 className="section-title">Adoption map · cost vs received value</h2>
+        <p className="section-lede">
+          Trajectory is the headline; position is the why. Each technology placed by relative cost
+          (capex + install friction on the supply side) and received value (customer demand pull
+          from the reasons matrix, weighted by current slider conditions for flexibility, resilience,
+          and trust). The quadrant a technology lands in implies the adoption shape it will take —
+          mainstream pull, mandate/premium push, optional add-on, or stranded without a value-stack
+          reset. The self-install slider also affects this view — high settings collapse the
+          install-friction contribution and pull plug-in-capable techs leftward into Mainstream Pull.
+        </p>
+        <AdoptionMap geo={geo} horizon={horizon} sliders={sliders} />
+      </section>
+
+      <section className="section">
+        <div className="section-marker">III</div>
         <h2 className="section-title">Why people buy</h2>
         <p className="section-lede">
           Customer types and the reasons that move them. Resilience and identity grow over time;
@@ -1745,7 +1794,7 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">III</div>
+        <div className="section-marker">IV</div>
         <h2 className="section-title">Live technology ranking</h2>
         <p className="section-lede">
           Drag the sliders and watch the order shift. Score combines geographic fit, demand pull
@@ -1756,27 +1805,13 @@ export default function App() {
       </section>
 
       <section className="section">
-        <div className="section-marker">IV</div>
+        <div className="section-marker">V</div>
         <h2 className="section-title">Technology comparison</h2>
         <p className="section-lede">
           Same eleven technology classes, expanded view. Card order matches the ranking. Geographic
           fit is fixed per region; the score reflects current slider conditions.
         </p>
         <TechGrid geo={geo} horizon={horizon} sliders={sliders} />
-      </section>
-
-      <section className="section">
-        <div className="section-marker">V</div>
-        <h2 className="section-title">Adoption map · cost vs received value</h2>
-        <p className="section-lede">
-          Adoption ultimately falls along cost vs value. Each technology is placed by relative cost
-          (capex + install friction on the supply side) and received value (customer demand pull
-          from the reasons matrix, weighted by current slider conditions for flexibility, resilience,
-          and trust). The quadrant a technology lands in implies the adoption shape it will take —
-          mainstream pull, mandate/premium push, optional add-on, or stranded without a value-stack
-          reset.
-        </p>
-        <AdoptionMap geo={geo} horizon={horizon} sliders={sliders} />
       </section>
 
       <section className="section">
