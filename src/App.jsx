@@ -241,6 +241,22 @@ const MARKET_SCALE = {
       { label: 'IEA Cold Chain Energy Demand', url: 'https://www.iea.org/' },
     ],
   },
+  emissions_sensing: {
+    headline: 'Compliance-driven — LL97 / BPS in US, EPBD in EU set the cadence',
+    geos: {
+      US: 'NYC LL97 directly covers ~50k properties >25k sq ft, with $268/MT-CO2 fines starting 2024 ratcheting through 2030 + 2040. BPS spreading to Boston, DC, Seattle, Denver, Chicago — combined addressable ~500k commercial/multifamily properties by 2030. EPA AIM Act tightens refrigerant-leak rules in parallel. Onsite DAC nascent; sensing + leak detection is the immediate wedge.',
+      EU: 'EU EPBD revision (2024) mandates emissions disclosure for non-residential >250m² by 2028, all buildings by 2030. F-gas regulation 2024 phases down high-GWP refrigerants. ~5M commercial buildings + ~25M apartment blocks addressable. UK MEES, Germany GEG add national-level pressure.',
+      LATAM: 'Limited regulatory framework; some city-level pilots in Mexico City and São Paulo. Voluntary corporate net-zero is the near-term driver.',
+      SA: 'Negligible regulatory pressure; voluntary corporate ESG only. Small near-term opportunity.',
+      IN: 'Emerging BEE (Bureau of Energy Efficiency) commercial building standards; corporate net-zero in IT/financial real estate. Small but growing.',
+    },
+    sources: [
+      { label: 'NYC LL97 Compliance Reports', url: 'https://www.nyc.gov/site/sustainability/our-programs/local-law-97.page' },
+      { label: 'EU EPBD Revision 2024', url: 'https://energy.ec.europa.eu/topics/energy-efficiency/energy-efficient-buildings/energy-performance-buildings-directive_en' },
+      { label: 'EPA AIM Act (Refrigerant Phase-Down)', url: 'https://www.epa.gov/climate-hfcs-reduction' },
+      { label: 'DOE Building Performance Standards Coalition', url: 'https://www.energy.gov/scep/building-performance-standards-coalition' },
+    ],
+  },
   aggregation: {
     headline: 'The orchestration layer; capital following deployment',
     geos: {
@@ -352,6 +368,14 @@ const ADOPTION_TIMELINE = {
     LATAM: [0.5, 1, 4, 10],
     SA: [1, 2, 8, 18],
     IN: [0.3, 0.5, 2, 5],
+  },
+  emissions_sensing: {
+    unit: '% of compliance-covered buildings with emissions sensing/capture',
+    US: [0, 1, 12, 35],
+    EU: [0, 1, 8, 28],
+    LATAM: [0, 0.1, 1, 4],
+    SA: [0, 0, 0.5, 2],
+    IN: [0, 0.1, 1, 4],
   },
   aggregation: {
     unit: '% of peak addressable via VPP / DER aggregation',
@@ -514,6 +538,25 @@ const TECHNOLOGIES = [
     secondary_driver: [],
   },
   {
+    id: 'emissions_sensing',
+    name: 'Building Emissions Sensing & Capture',
+    icon: '⌬',
+    capex_score: 3,
+    capex_usd: '$2k–25k/building (sensors); DAC unit pricing project-specific',
+    lifespan: '10–15y',
+    dispatchability: 1,
+    flexibility: 1,
+    resilience: 1,
+    install_friction: 2,
+    margin_potential: 4,
+    value_stack: ['LL97 / BPS compliance', 'Methane leak detection', 'Refrigerant management', 'HVAC commissioning + monitoring', 'Onsite DAC + scope-1 capture'],
+    portfolio: 'Thalo Labs (sensing + analytics + modular DAC; Newark Terminal B flagship)',
+    note: 'Not a grid-flex play — a compliance + measurement + capture play. Same customer set as Kelvin (LL97-covered multifamily + commercial), complementary value stack: Kelvin reduces emissions via smart controls and partial electrification; Thalo measures, leak-detects, and captures the residual. Three product layers — sensing platform (real-time greenhouse gas measurement at boilers, refrigerant systems), capture (modular Direct Air Capture units, Newark Liberty Terminal B is the flagship), and Sidekick predictive HVAC intelligence (cellular-connected sensors for refrigerant-based systems, sensor-verified commissioning). Methane leaks alone account for ~25% of NYC building emissions; sensing-led reduction has the fastest payback under $268/MT-CO2 fines. DAC unit economics still emerging — capture is the long-game offering, sensing is the near-term wedge.',
+    geo_fit: { US: 3, EU: 3, LATAM: 1, SA: 1, IN: 1 },
+    primary_driver: ['identity', 'capex'],
+    secondary_driver: ['bills', 'comfort'],
+  },
+  {
     id: 'aggregation',
     name: 'Aggregation / VPP Software',
     icon: '◆',
@@ -626,12 +669,12 @@ const BUSINESS_MODELS = [
 ];
 
 const CAPITAL_MARKETS = [
-  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', hybrid_electrification: 'mature', heat_pump: 'mature', commercial_heat: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
-  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'mature', commercial_heat: 'emerging', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
-  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'limited', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
-  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'none', smart_thermostat: 'limited', battery: 'mature', leak_thermal: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', hybrid_electrification: 'limited', heat_pump: 'limited', commercial_heat: 'none', smart_thermostat: 'none', battery: 'emerging', leak_thermal: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', hybrid_electrification: 'none', heat_pump: 'none', commercial_heat: 'none', smart_thermostat: 'none', battery: 'limited', leak_thermal: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
+  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', hybrid_electrification: 'mature', heat_pump: 'mature', commercial_heat: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'mature', emissions_sensing: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
+  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'mature', commercial_heat: 'emerging', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'emerging', emissions_sensing: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
+  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'limited', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'limited', emissions_sensing: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
+  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'none', smart_thermostat: 'limited', battery: 'mature', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', hybrid_electrification: 'limited', heat_pump: 'limited', commercial_heat: 'none', smart_thermostat: 'none', battery: 'emerging', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', hybrid_electrification: 'none', heat_pump: 'none', commercial_heat: 'none', smart_thermostat: 'none', battery: 'limited', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
 ];
 
 const WILDCARDS = [
