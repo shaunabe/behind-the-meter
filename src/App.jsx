@@ -92,6 +92,17 @@ const SLIDER_REFERENCES = {
       { label: 'Insurance Information Institute Climate Reports', url: 'https://www.iii.org/' },
     ],
   },
+  self_install: {
+    measures: 'How much install friction is collapsing through plug-in / DIY form factors. Install friction has been the rate-limiter on residential BTM adoption — not capex, not value prop, but installer-channel capacity, permitting time, and electrician scheduling. When plug-and-play form factors arrive and policy allows them, adoption curves bend sharply.',
+    current: 'Germany passed 1.03M registered balcony solar systems by June 2025 — up from ~500k twelve months earlier (a doubling in 12 months). Spain has ~1.5M. Gradient ships a 120V plug-in window heat pump that installs in 30 minutes with no permits, no contractor, no HOA approval — NYCHA contracted for 10,000 units. EcoFlow, Anker, and Bluetti sell portable plug-in batteries at retail. Focal heaters are already plug-and-play. Thalo Sidekick installs cellular without Wi-Fi. The US is catching up at the state level: Utah passed the first plug-in solar law in March 2025; Virginia followed in March 2026 (96-0 Senate, 93-4 House); Colorado and Maryland are awaiting governor signatures; 28+ states have active legislation.',
+    forecast: 'European balcony solar market projected $500M (2025) → $1.8B (2033) at ~15% CAGR. Across one million-plus compliant installations in Germany, the safety incident count is zero — that record is now landing in US legislatures with bipartisan support. Plug-in heat pumps (Gradient, Ephoca, Chinese OEMs) and modular batteries (EcoFlow PowerOcean, Anker SOLIX X1) are following the same channel-collapse pattern: retail purchase, DIY install, no permits. The structural shift removes the installer-capacity bottleneck that has capped electrification rollout speed.',
+    sources: [
+      { label: 'Marktstammdatenregister (German balcony solar registry)', url: 'https://www.marktstammdatenregister.de/' },
+      { label: 'MDPI Energies: Barriers to Balcony Solar in the US (2025)', url: 'https://www.mdpi.com/journal/energies' },
+      { label: 'Canary Media / Bright Saver state tracker', url: 'https://www.canarymedia.com/' },
+      { label: 'Gradient 120V All-Weather Heat Pump', url: 'https://www.gradientcomfort.com/products/gradient-all-weather-120v-window-heat-pump' },
+    ],
+  },
 };
 
 const REASONS_MATRIX_BASE = {
@@ -433,6 +444,7 @@ const TECHNOLOGIES = [
     flexibility: 5,
     resilience: 1,
     install_friction: 1,
+    self_install_potential: 2,
     margin_potential: 4,
     value_stack: ['DR/DSM', 'TOU shift', 'Avoided geyser replacement', 'Hot-water-as-service'],
     portfolio: 'Plentify (HotBot, SA leader)',
@@ -452,6 +464,7 @@ const TECHNOLOGIES = [
     flexibility: 4,
     resilience: 4,
     install_friction: 2,
+    self_install_potential: 2,
     margin_potential: 4,
     value_stack: ['Decarb mandate compliance (LL97)', 'Gas avoidance during mild weather', 'DR/DSM', 'Comfort (AC included)', 'Avoided full retrofit capex'],
     portfolio: 'Kelvin (NYC multifamily — Cozy + Adaptive Electrification)',
@@ -471,6 +484,7 @@ const TECHNOLOGIES = [
     flexibility: 3,
     resilience: 2,
     install_friction: 5,
+    self_install_potential: 4,
     margin_potential: 3,
     value_stack: ['DR/DSM', 'Efficiency', 'Decarb mandate', 'Comfort premium'],
     portfolio: 'Gradient (window-unit form factor for dense multifamily)',
@@ -490,6 +504,7 @@ const TECHNOLOGIES = [
     flexibility: 2,
     resilience: 0,
     install_friction: 1,
+    self_install_potential: 5,
     margin_potential: 4,
     value_stack: ['Propane displacement', 'Patio season extension', 'Avoided fossil logistics', 'Energy savings (vs propane)', 'Hospitality comfort / UX', 'Pairs with battery for flex + demand-charge avoidance'],
     portfolio: 'Focal (plug-in electric heaters for restaurants & outdoor dining)',
@@ -509,6 +524,7 @@ const TECHNOLOGIES = [
     flexibility: 4,
     resilience: 1,
     install_friction: 1,
+    self_install_potential: 5,
     margin_potential: 3,
     value_stack: ['DR/DSM', 'Efficiency', 'Comfort'],
     portfolio: 'Flair (vent-level zoning)',
@@ -528,6 +544,7 @@ const TECHNOLOGIES = [
     flexibility: 5,
     resilience: 5,
     install_friction: 4,
+    self_install_potential: 4,
     margin_potential: 4,
     value_stack: ['Resilience', 'TOU arbitrage', 'DR', 'Wholesale (where allowed)', 'Solar self-consumption'],
     portfolio: '—',
@@ -547,6 +564,7 @@ const TECHNOLOGIES = [
     flexibility: 0,
     resilience: 2,
     install_friction: 2,
+    self_install_potential: 5,
     margin_potential: 5,
     value_stack: ['Insurance discount', 'Avoided loss', 'Compliance', 'Predictive maintenance'],
     portfolio: 'Glacier Grid (commercial refrigeration)',
@@ -566,6 +584,7 @@ const TECHNOLOGIES = [
     flexibility: 0,
     resilience: 1,
     install_friction: 1,
+    self_install_potential: 5,
     margin_potential: 5,
     value_stack: ['Refrigerant leak prevention', 'Sensor-verified commissioning', 'Heat pump performance monitoring', 'Avoided callbacks / warranty leakage', 'AIM Act / F-gas compliance'],
     portfolio: 'Thalo Labs (Sidekick — cellular HVAC monitoring for contractors)',
@@ -585,6 +604,7 @@ const TECHNOLOGIES = [
     flexibility: 5,
     resilience: 2,
     install_friction: 1,
+    self_install_potential: 0,
     margin_potential: 5,
     value_stack: ['Capacity', 'Ancillary services', 'Wholesale', 'Distribution deferral'],
     portfolio: '—',
@@ -604,6 +624,7 @@ const TECHNOLOGIES = [
     flexibility: 4,
     resilience: 3,
     install_friction: 3,
+    self_install_potential: 2,
     margin_potential: 3,
     value_stack: ['Managed charging', 'V2G (emerging)', 'Capacity', 'Energy arbitrage'],
     portfolio: '—',
@@ -623,6 +644,7 @@ const TECHNOLOGIES = [
     flexibility: 3,
     resilience: 3,
     install_friction: 4,
+    self_install_potential: 1,
     margin_potential: 3,
     value_stack: ['Avoided service upgrade', 'Load orchestration', 'Resilience', 'Insurance'],
     portfolio: '—',
@@ -752,6 +774,14 @@ const WILDCARDS = [
     implication: 'Heat pumps win twice: they meet the REPowerEU heating target (60M units by 2030) AND replace the AC purchase, vs. installing both. The timeline reflects EU heat pump going 23%\u219245%\u219265% by 2035 — a steeper curve than US because cooling demand is pulling forward what was already a decarb-mandate trajectory. Knock-on effects: smart thermostats become essential for managing dual-peaking grids, batteries pair with PV for solar self-consumption during heatwaves (Ember notes EU solar generated record 45 TWh in June 2025), and Kelvin\u2019s hybrid model has a bigger EU TAM than the heating-only frame suggested.',
     timeframe: 'Inflection now. Compounding through 2035.',
   },
+  {
+    id: 'plug_in_revolution',
+    title: 'The Plug-In Revolution',
+    hook: 'Install friction collapses → adoption curves bend',
+    body: 'Germany passed 1.03M registered balcony solar systems by June 2025, doubling from 500k twelve months earlier and pushing past Spain\u2019s 1.5M. Zero safety incidents across the entire million-plus compliant base, per UL Solutions and peer-reviewed analysis. That track record is landing in US legislatures: Utah passed the first plug-in solar law in March 2025 (unanimous bipartisan); Virginia followed in March 2026 (96-0 Senate, 93-4 House); Colorado and Maryland are awaiting signatures; 28+ states have active legislation. Hardware following the same channel-collapse pattern: Gradient\u2019s 120V window heat pump installs in 30 minutes with no contractor / permit / HOA approval (NYCHA contracted 10,000 units). Ephoca, Chinese OEMs, and Mitsubishi following with plug-in HP form factors. EcoFlow PowerOcean, Anker SOLIX X1, Bluetti — modular plug-in batteries at retail. Focal already plug-and-play. Thalo Sidekick installs cellular without Wi-Fi. The pattern is consistent across categories.',
+    implication: 'Install friction has been the underappreciated rate-limiter on residential BTM. Installer-channel capacity, permit waits, electrician scheduling — not capex or value prop — caps adoption speed for most categories. When plug-and-play form factors arrive and policy allows them, curves bend sharply. Portfolio companies positioned to benefit most: Gradient (120V plug-in HP is the canonical case), Focal (already retail-ready), Plentify (retrofits existing, no new install), Thalo Sidekick (cellular install), Flair (DIY zoning). Categories that still need building-level integration — Kelvin\u2019s hybrid platform, smart panels, central HVAC — have less near-term lift from this force, but are positioned to benefit as adjacent self-install volume drives consumer familiarity with electrification. The timeline\u2019s self-install slider models this: drag it up and curves for high-potential techs accelerate.',
+    timeframe: 'EU already there. US 2025–2028 inflection. Channel structure rewrites by 2030.',
+  },
 ];
 
 const ROOFTOP_SOLAR_HISTORY = [
@@ -763,11 +793,11 @@ const ROOFTOP_SOLAR_HISTORY = [
 ];
 
 const GEO_DEFAULTS = {
-  US: { regulatory: 60, capital_depth: 85, customer_trust: 65, peak_pressure: 60, resilience_demand: 60, electrification: 55, insurance: 55 },
-  EU: { regulatory: 75, capital_depth: 70, customer_trust: 70, peak_pressure: 50, resilience_demand: 40, electrification: 75, insurance: 50 },
-  LATAM: { regulatory: 35, capital_depth: 35, customer_trust: 40, peak_pressure: 65, resilience_demand: 80, electrification: 30, insurance: 25 },
-  SA: { regulatory: 40, capital_depth: 30, customer_trust: 50, peak_pressure: 90, resilience_demand: 95, electrification: 25, insurance: 20 },
-  IN: { regulatory: 45, capital_depth: 50, customer_trust: 45, peak_pressure: 80, resilience_demand: 75, electrification: 40, insurance: 30 },
+  US: { regulatory: 60, capital_depth: 85, customer_trust: 65, peak_pressure: 60, resilience_demand: 60, electrification: 55, insurance: 55, self_install: 40 },
+  EU: { regulatory: 75, capital_depth: 70, customer_trust: 70, peak_pressure: 50, resilience_demand: 40, electrification: 75, insurance: 50, self_install: 70 },
+  LATAM: { regulatory: 35, capital_depth: 35, customer_trust: 40, peak_pressure: 65, resilience_demand: 80, electrification: 30, insurance: 25, self_install: 35 },
+  SA: { regulatory: 40, capital_depth: 30, customer_trust: 50, peak_pressure: 90, resilience_demand: 95, electrification: 25, insurance: 20, self_install: 30 },
+  IN: { regulatory: 45, capital_depth: 50, customer_trust: 45, peak_pressure: 80, resilience_demand: 75, electrification: 40, insurance: 30, self_install: 35 },
 };
 
 // ============================================================================
@@ -854,9 +884,16 @@ function scoreBusinessModel(model, sliders) {
 // Value dimension: customer-pull from reasons matrix + slider-weighted flexibility / resilience.
 // Kept orthogonal from each other so techs scatter rather than collapse to a diagonal.
 function computeCostValue(tech, geo, horizon, sliders) {
-  // Cost — higher capex_score means cheaper, install_friction 1 = easy / 5 = hard
-  const capexPart = (5 - tech.capex_score) * 12;        // 0-48
-  const installPart = (tech.install_friction - 1) * 13; // 0-52
+  // Cost — higher capex_score means cheaper, install_friction 1 = easy / 5 = hard.
+  // Install friction can be eroded by self-install / plug-in form factors:
+  // each tech has a self_install_potential (0-5) that scales how much the
+  // self_install slider reduces its installPart contribution.
+  const capexPart = (5 - tech.capex_score) * 12;                       // 0-48
+  const installRaw = (tech.install_friction - 1) * 13;                 // 0-52
+  const siSlider = (sliders.self_install || 0) / 100;                  // 0-1
+  const siPotential = (tech.self_install_potential || 0) / 5;          // 0-1
+  const installReduction = installRaw * siSlider * siPotential;        // collapses with plug-in
+  const installPart = Math.max(0, installRaw - installReduction);
   const cost = Math.max(0, Math.min(100, capexPart + installPart));
 
   // Value — averaged across customer types for current geo + horizon,
@@ -936,6 +973,7 @@ function TopBar({ geo, setGeo, horizon, setHorizon, sliders, setSliders, resetSl
       label: 'Adjacent forces',
       items: [
         { key: 'insurance', name: 'Insurance as buyer', help: 'Insurers paying for hardening / loss prevention' },
+        { key: 'self_install', name: 'Self-install proliferation', help: 'Plug-and-play form factors collapsing install friction' },
       ],
     },
   ];
@@ -1347,13 +1385,25 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
   // Per-tech color + line style assigned in TECH_STYLE; not tied to current
   // cost-value quadrant — that's the Adoption Map's job. Here each tech is
   // visually distinct so trajectories can be compared at a glance.
+  // Self-install slider boosts future-year points (2030, 2035) based on each
+  // tech's self_install_potential — plug-in form factors collapse install
+  // friction and unlock retail channels, bending adoption curves upward.
   const techData = useMemo(() => {
+    const siSlider = (sliders.self_install || 0) / 100;
     return TECHNOLOGIES.map((t) => {
       const series = ADOPTION_TIMELINE[t.id];
       if (!series || !series[geo]) return null;
-      return { tech: t, points: series[geo], unit: series.unit };
+      const raw = series[geo];
+      const siPotential = (t.self_install_potential || 0) / 5;
+      // No boost in 2020/2025 (already happened). Up to +30% in 2030, +60% in 2035.
+      const boostFor = [0, 0, 0.3, 0.6];
+      const adjusted = raw.map((p, i) => {
+        const boost = 1 + siSlider * siPotential * boostFor[i];
+        return Math.min(100, p * boost);
+      });
+      return { tech: t, points: adjusted, raw, unit: series.unit };
     }).filter(Boolean);
-  }, [geo]);
+  }, [geo, sliders.self_install]);
 
   const W = 800;
   const H = 460;
@@ -1468,7 +1518,7 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
       </div>
 
       <div className="timeline-footnote">
-        Trajectories reflect IEA WEO 2025 (heat pumps, EVs), DOE Liftoff (VPP), EHPA / REPowerEU targets, BNEF storage outlook, and the MARKET_SCALE prose above. Embeds two macro forces: AI/datacenter capacity crunch pulls aggregation and battery curves higher in US/EU; EU summer cooling surge accelerates EU heat pump (heating + cooling), thermostat, and battery curves.
+        Trajectories reflect IEA WEO 2025 (heat pumps, EVs), DOE Liftoff (VPP), EHPA / REPowerEU targets, BNEF storage outlook, and the MARKET_SCALE prose above. Embeds three macro forces: AI/datacenter capacity crunch pulls aggregation and battery curves higher; EU summer cooling surge accelerates EU heat pump, thermostat, and battery curves; self-install proliferation (Germany 1M+ balcony solar in 4 years, Utah/Virginia plug-in solar laws, Gradient 120V heat pump, Focal plug-in, Thalo Sidekick cellular) bends future-year points upward for techs with high plug-in potential. Drag the self-install slider to see this third force play out.
       </div>
     </div>
   );
@@ -1673,11 +1723,12 @@ export default function App() {
         <p className="section-lede">
           The headline view. Penetration of addressable base by year, by geography. Each technology
           has its own color and line style so trajectories are easy to compare at a glance. Solid
-          lines mark portfolio-represented technologies. Trajectories embed two macro forces — the
-          AI/datacenter capacity crunch (pulling aggregation and battery curves higher in markets
-          with active wholesale plus hyperscaler co-funding) and the EU summer cooling surge
-          (accelerating EU heat pump, thermostat, and battery curves as buildings designed for cold
-          need to handle 40°C summers).
+          lines mark portfolio-represented technologies. Trajectories embed three macro forces — the
+          AI/datacenter capacity crunch (pulling aggregation and battery curves higher), the EU
+          summer cooling surge (accelerating EU heat pump, thermostat, and battery curves as
+          buildings designed for cold need to handle 40°C summers), and self-install proliferation
+          (plug-in form factors collapsing install friction across categories with high
+          self_install_potential). Drag the self-install slider to see the third force play out.
         </p>
         <AdoptionTimeline geo={geo} horizon={horizon} sliders={sliders} />
       </section>
