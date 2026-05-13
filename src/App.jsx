@@ -103,6 +103,17 @@ const SLIDER_REFERENCES = {
       { label: 'Gradient 120V All-Weather Heat Pump', url: 'https://www.gradientcomfort.com/products/gradient-all-weather-120v-window-heat-pump' },
     ],
   },
+  v2g_enablement: {
+    measures: 'Share of the EV stock that is actually dispatchable bidirectionally — gated by V2G-capable vehicle SKUs, bidirectional charger availability, transfer-switch/sub-panel install, and tariff structures that pay for export. EV penetration alone does not equal V2G capacity; this slider models the conversion ratio.',
+    current: 'Ford F-150 Lightning + Charge Station Pro is the canonical US installed base — ~150k Lightnings on the road, ~5–10% have the bidirectional charger. GM Energy V2H launched 2024. Wallbox Quasar 2 and dcbel are shipping. PG&E, Duke, and Xcel have V2G pilots. UK is furthest along in EU — Octopus Powerloop, OVO, Indra. EU AFIR mandates smart/bidirectional charging in new public infrastructure. Germany allows V2G under §14a EnWG flex tariffs. Total global V2G-capable charger installed base est. ~30k units; vehicle SKU support widening fast (Hyundai Ioniq 5, Kia EV9, Lucid, Rivian R1T 2025+).',
+    forecast: 'DOE V2G Liftoff projects 20–90 GW of dispatchable EV capacity by 2030 in the US alone — wide range reflects the conversion-ratio uncertainty this slider captures. Trajectories depend on (1) bidirectional charger cost decline ($4–6k → $1–2k by 2030), (2) tariff reform (currently most US utilities pay retail energy, not capacity, for export), (3) OEM warranty terms for V2G cycling. Wildcard: California Title 24 + UK / German building-code mandates pushing bidirectional as default in new construction.',
+    sources: [
+      { label: 'DOE V2G Liftoff Report', url: 'https://liftoff.energy.gov/' },
+      { label: 'Ford Intelligent Backup Power', url: 'https://www.ford.com/support/category/electric-vehicles/intelligent-backup-power/' },
+      { label: 'Octopus Energy Powerloop (UK V2G)', url: 'https://octopus.energy/smart/powerloop/' },
+      { label: 'EU AFIR — Alternative Fuels Infrastructure Regulation', url: 'https://transport.ec.europa.eu/transport-themes/clean-transport/alternative-fuels-sustainable-mobility-europe/alternative-fuels-infrastructure_en' },
+    ],
+  },
 };
 
 const REASONS_MATRIX_BASE = {
@@ -222,19 +233,65 @@ const MARKET_SCALE = {
       { label: 'DOE VPP Liftoff Report', url: 'https://liftoff.energy.gov/vpp/' },
     ],
   },
-  battery: {
-    headline: 'Highest flex per unit; economics dominated by rate design + resilience demand',
+  battery_pro: {
+    headline: 'Whole-home stationary battery — bankable, electrician-installed, ABS-financed',
     geos: {
-      US: '~700k residential systems installed (2024); BNEF projects ~1M+ added annually by 2027. Total residential capacity ~7 GW. ~3 GW commercial/industrial BTM.',
-      EU: '~2M residential batteries; Germany ~1.5M alone. Italy, UK accelerating.',
-      LATAM: 'Small (~100k residential); load-shedding-driven growth in Argentina, Mexico, parts of Brazil.',
-      SA: '~150k+ residential battery installations during load-shedding peak (2023). Growing despite reduced load-shedding pressure.',
-      IN: 'Small (<50k residential); commercial BTM growing for solar self-consumption.',
+      US: '~700k residential systems installed (2024), almost entirely Powerwall / Enphase / FranklinWH / Sunrun. Total residential capacity ~7 GW. ~3 GW commercial/industrial BTM. Attach rate to new residential solar crossed 25–30% in CA post-NEM 3.0. Channel = solar installer network (Sunrun, Sunpower bankruptcy fallout, Palmetto). Capital stack reaches ABS (Sunrun ABS 2024 deals).',
+      EU: '~2M residential batteries; Germany ~1.5M dominant. Italy second-largest. Almost all professionally installed — German regulation (DIN VDE V 0126-95) requires electrician install once a battery is attached even to a plug-in PV system.',
+      LATAM: '~100k residential; load-shedding-driven growth in Argentina, Mexico, parts of Brazil. Installer channel underdeveloped.',
+      SA: '~150k+ professionally installed residential batteries during 2023 load-shedding peak. Growing despite reduced load-shedding pressure.',
+      IN: '<50k residential professional installs; commercial BTM growing for solar self-consumption.',
     },
     sources: [
       { label: 'BNEF Energy Storage Market Outlook', url: 'https://about.bnef.com/insights/clean-energy/energy-storage/' },
       { label: 'Wood Mackenzie US Energy Storage Monitor', url: 'https://www.woodmac.com/research/products/power-and-renewables/us-energy-storage-monitor/' },
       { label: 'SolarPower Europe Battery Storage Outlook', url: 'https://www.solarpowereurope.org/' },
+    ],
+  },
+  battery_diy: {
+    headline: 'Plug-in portable battery — retail-channel, cash purchase, growing fast',
+    geos: {
+      US: 'EcoFlow Delta Pro Ultra, Anker SOLIX F3800, Bluetti AC500 — sold via Amazon, Costco, Home Depot. Total US shipments est. >2M units cumulative through 2025. Cannibalizes gas generator market for resilience use case; rarely connected for back-feed. Cash purchase, no financing channel.',
+      EU: 'Germany now ~40% of new balcony solar buyers attach a battery (up from 20% in 2023). All-in-one balcony PV + storage kits from Deye, Anker, Zendure shipping at retail. Spain and Belgium following the same retail channel.',
+      LATAM: 'Generator-replacement use case strong in Argentina, Brazil. EcoFlow distribution expanding through Mercado Libre.',
+      SA: 'Strongest LATAM/SA segment due to load-shedding — EcoFlow and Bluetti units sold widely via Takealot. Hundreds of thousands shipped.',
+      IN: 'Nascent retail channel; portable battery use cases concentrated around backup for small commercial / shop owners.',
+    },
+    sources: [
+      { label: 'EcoFlow product line + shipment disclosures', url: 'https://www.ecoflow.com/' },
+      { label: 'Anker SOLIX retail data', url: 'https://www.anker.com/anker-solix' },
+      { label: 'BalkonSolar plug-in PV + storage trends', url: 'https://balkon.solar/' },
+    ],
+  },
+  battery_v2g: {
+    headline: 'EVs dispatched bidirectionally — capacity unlocks paced by chargers + tariffs',
+    geos: {
+      US: 'Ford F-150 Lightning + Charge Station Pro is the canonical installed base — ~150k Lightnings on the road, ~5–10% V2H-equipped. Wallbox Quasar 2 shipping. GM Energy V2H launched 2024. PG&E and Duke pilots active. Bidirectional charger requires electrician + transfer switch + sub-panel.',
+      EU: 'UK V2G pilots furthest along (OVO, Octopus, Indra). Germany allowing V2G under §14a EnWG flex tariffs. Nissan Leaf is V2G-native via CHAdeMO. ~10k commercial V2G chargers installed across EU. Coming wave from EU AFIR mandate for smart/bidirectional chargers in new buildings.',
+      LATAM: 'Pre-commercial. Bidirectional chargers not yet certified in most markets.',
+      SA: 'Pre-commercial.',
+      IN: 'Pre-commercial; concentrated interest from fleet operators (e.g. BluSmart pre-bankruptcy was exploring).',
+    },
+    sources: [
+      { label: 'DOE V2G Liftoff Report', url: 'https://liftoff.energy.gov/' },
+      { label: 'Ford Intelligent Backup Power', url: 'https://www.ford.com/support/category/electric-vehicles/intelligent-backup-power/' },
+      { label: 'Octopus Energy V2G (Powerloop)', url: 'https://octopus.energy/smart/powerloop/' },
+    ],
+  },
+  solar_balcony_diy: {
+    headline: 'Plug-in PV ≤800W — the canonical EU self-install story',
+    geos: {
+      US: 'Pre-market nationally. Utah (Mar 2025) and Virginia (Mar 2026, 96-0 Senate / 93-4 House) passed plug-in solar laws. 28+ states with active bills. No nationally-certified product yet — pending UL standard + NEC code amendment (October 2025 cycle rejected; 2026 cycle pending). First US sales likely H2 2026.',
+      EU: 'Germany: 1.1M registered + est. 3–4M total installed by Nov 2025 (registration compliance ~30–50%). Spain ~1.5M. Belgium has plug-and-play certified products. Italy, France slower (paperwork-gated). EU balcony solar market projected $500M (2025) → $1.8B (2033), 15% CAGR. Q1 2026 Germany installs declined 6% YoY — market hitting top of S-curve.',
+      LATAM: 'No regulatory framework yet. Some informal installs in Argentina, Brazil.',
+      SA: 'No framework. Watch as load-shedding declines and bill-driven solar takes over.',
+      IN: 'No framework. Net-metering rules favor full rooftop install.',
+    },
+    sources: [
+      { label: 'Marktstammdatenregister (DE Federal Network Agency)', url: 'https://www.marktstammdatenregister.de/' },
+      { label: 'BalkonSolar — DIN VDE V 0126-95:2025-12', url: 'https://balkon.solar/news/2025/11/22/what-does-the-new-german-plug-in-pv-norm-say/' },
+      { label: 'Canary Media — US plug-in solar state tracker', url: 'https://www.canarymedia.com/articles/solar/balcony-panels-germany-utah' },
+      { label: 'BSW-Solar Q1 2026 installation figures', url: 'https://www.solarwirtschaft.de/' },
     ],
   },
   leak_thermal: {
@@ -336,7 +393,10 @@ const TECH_STYLE = {
   smart_thermostat:       { color: '#8000FF', dash: undefined,       width: 2.5 }, // Purple solid — Flair
   leak_thermal:           { color: '#E900E9', dash: undefined,       width: 2.5 }, // Magenta solid — Glacier Grid
   emissions_sensing:      { color: '#D90000', dash: undefined,       width: 2.5 }, // Red solid — Thalo
-  battery:                { color: '#0000B5', dash: '7 4',           width: 2.0 }, // Dark blue dashed
+  battery_pro:            { color: '#0000B5', dash: '7 4',           width: 2.0 }, // Dark blue dashed — Powerwall-class
+  battery_diy:            { color: '#00C7E0', dash: '4 2',           width: 2.0 }, // Cyan dashed — EcoFlow/Anker/Bluetti
+  battery_v2g:            { color: '#5A0F8A', dash: '8 3 2 3',       width: 2.0 }, // Dark purple dash-dot — V2G via bidirectional charger
+  solar_balcony_diy:      { color: '#F5C400', dash: '2 3',           width: 2.0 }, // Yellow dotted — German balcony PV
   aggregation:            { color: '#000000', dash: '2 3',           width: 2.0 }, // Black dotted
   ev:                     { color: '#404040', dash: '8 3 2 3',       width: 2.0 }, // Dark gray dash-dot
   smart_panel:            { color: '#004D00', dash: '7 4',           width: 2.0 }, // Dark green dashed
@@ -382,13 +442,37 @@ const ADOPTION_TIMELINE = {
     SA: [3, 6, 18, 35],
     IN: [2, 5, 15, 30],
   },
-  battery: {
-    unit: '% of single-family homes with stationary battery',
-    US: [0.4, 0.9, 5, 13],
-    EU: [1, 3, 11, 22],
-    LATAM: [0.1, 0.3, 1.2, 3],
-    SA: [1, 3, 8, 16],
-    IN: [0.01, 0.1, 0.5, 1.5],
+  battery_pro: {
+    unit: '% of single-family homes with professionally-installed stationary battery',
+    US: [0.4, 0.9, 4, 11],
+    EU: [1, 3, 9, 18],
+    LATAM: [0.1, 0.3, 1, 2.5],
+    SA: [1, 3, 7, 14],
+    IN: [0.01, 0.1, 0.4, 1.2],
+  },
+  battery_diy: {
+    unit: '% of households with plug-in / portable battery (≥1 kWh useful)',
+    US: [0.1, 0.5, 4, 12],
+    EU: [0.3, 1.5, 6, 14],
+    LATAM: [0.05, 0.3, 2, 5],
+    SA: [0.5, 2, 6, 12],
+    IN: [0.02, 0.1, 0.8, 2.5],
+  },
+  battery_v2g: {
+    unit: '% of EV stock dispatchable as V2G (charger + tariff enabled)',
+    US: [0, 0.2, 4, 18],
+    EU: [0, 0.5, 7, 25],
+    LATAM: [0, 0, 0.3, 2],
+    SA: [0, 0, 0.2, 1.5],
+    IN: [0, 0, 0.5, 3],
+  },
+  solar_balcony_diy: {
+    unit: '% of households with plug-in PV (≤800W per unit)',
+    US: [0, 0, 0.5, 6],
+    EU: [0.5, 4, 12, 22],
+    LATAM: [0, 0.1, 1, 4],
+    SA: [0, 0.1, 1, 3],
+    IN: [0, 0, 0.3, 2],
   },
   leak_thermal: {
     unit: '% of insured properties with leak/asset sensors',
@@ -534,8 +618,8 @@ const TECHNOLOGIES = [
     secondary_driver: ['identity'],
   },
   {
-    id: 'battery',
-    name: 'Stationary Battery (Home/SMB)',
+    id: 'battery_pro',
+    name: 'Battery — Whole-home (pro install)',
     icon: '▮',
     capex_score: 1,
     capex_usd: '$10k–25k installed',
@@ -543,15 +627,75 @@ const TECHNOLOGIES = [
     dispatchability: 5,
     flexibility: 5,
     resilience: 5,
-    install_friction: 4,
-    self_install_potential: 4,
+    install_friction: 5,
+    self_install_potential: 1,
     margin_potential: 4,
     value_stack: ['Resilience', 'TOU arbitrage', 'DR', 'Wholesale (where allowed)', 'Solar self-consumption'],
     portfolio: '—',
-    note: 'Most flexible asset, highest capex. Economics dominated by rate design and stacking rules.',
+    note: 'Most flexible asset, highest capex. Channel = solar installer network; ABS-bankable. Pairs naturally with rooftop solar (US attach rate ~25–30% post-NEM 3.0). Powerwall, Enphase IQ, FranklinWH, Sunrun.',
     geo_fit: { US: 3, EU: 2, LATAM: 2, SA: 3, IN: 2 },
     primary_driver: ['resilience', 'bills'],
     secondary_driver: ['identity'],
+  },
+  {
+    id: 'battery_diy',
+    name: 'Battery — Portable / plug-in (DIY)',
+    icon: '▯',
+    capex_score: 3,
+    capex_usd: '$3k–8k for usable kWh',
+    lifespan: '7–10y',
+    dispatchability: 3,
+    flexibility: 3,
+    resilience: 4,
+    install_friction: 1,
+    self_install_potential: 5,
+    margin_potential: 3,
+    value_stack: ['Resilience', 'Generator replacement', 'Solar self-consumption (when paired)', 'Off-grid use'],
+    portfolio: '—',
+    note: 'Retail channel (Amazon, Costco, Hornbach). EcoFlow Delta Pro Ultra, Anker SOLIX, Bluetti AC500. Cannibalizing gas generator market for resilience. ~40% attach rate to new German balcony solar in 2025. Cash purchase — no financing channel yet.',
+    geo_fit: { US: 3, EU: 3, LATAM: 2, SA: 3, IN: 2 },
+    primary_driver: ['resilience', 'capex'],
+    secondary_driver: ['bills'],
+  },
+  {
+    id: 'battery_v2g',
+    name: 'Battery — V2G (vehicle-to-grid)',
+    icon: '▭',
+    capex_score: 2,
+    capex_usd: '$2k–6k (bidirectional charger only; battery is the EV)',
+    lifespan: '10–15y',
+    dispatchability: 4,
+    flexibility: 4,
+    resilience: 5,
+    install_friction: 3,
+    self_install_potential: 2,
+    margin_potential: 4,
+    value_stack: ['V2H backup', 'V2G capacity', 'Energy arbitrage', 'Demand charge avoidance'],
+    portfolio: '—',
+    note: 'Addressable base = EV stock × V2G-capable share × bidirectional-charger-installed share. Ford Lightning + Charge Station Pro is the canonical US case; UK Octopus Powerloop / Indra is the canonical EU case. Mobility constraint limits dispatchability vs. stationary.',
+    geo_fit: { US: 3, EU: 3, LATAM: 1, SA: 1, IN: 1 },
+    primary_driver: ['resilience', 'bills'],
+    secondary_driver: ['identity'],
+  },
+  {
+    id: 'solar_balcony_diy',
+    name: 'Solar — Balcony / plug-in PV (DIY)',
+    icon: '☀',
+    capex_score: 4,
+    capex_usd: '$400–1,200 per unit',
+    lifespan: '15–20y',
+    dispatchability: 0,
+    flexibility: 0,
+    resilience: 1,
+    install_friction: 1,
+    self_install_potential: 5,
+    margin_potential: 2,
+    value_stack: ['Self-consumption (bill offset)', 'Renter access to solar', 'Climate identity'],
+    portfolio: '—',
+    note: 'Plug-in PV ≤800W per unit. Germany 1.1M registered + est. 3–4M actual installed by Nov 2025. EU regulatory framework mature (DIN VDE V 0126-95). US pre-market — Utah and Virginia laws passed but no UL-listed product yet. ~40% of new German buyers attach a battery_diy. Renter-accessible (rights enshrined in German rental law).',
+    geo_fit: { US: 1, EU: 3, LATAM: 2, SA: 2, IN: 1 },
+    primary_driver: ['bills', 'identity'],
+    secondary_driver: ['capex'],
   },
   {
     id: 'leak_thermal',
@@ -709,12 +853,12 @@ const BUSINESS_MODELS = [
 ];
 
 const CAPITAL_MARKETS = [
-  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', hybrid_electrification: 'mature', heat_pump: 'mature', commercial_heat: 'mature', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'mature', emissions_sensing: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
-  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'mature', commercial_heat: 'emerging', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'emerging', emissions_sensing: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
-  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'limited', smart_thermostat: 'mature', battery: 'mature', leak_thermal: 'limited', emissions_sensing: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
-  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'none', smart_thermostat: 'limited', battery: 'mature', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', hybrid_electrification: 'limited', heat_pump: 'limited', commercial_heat: 'none', smart_thermostat: 'none', battery: 'emerging', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
-  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', hybrid_electrification: 'none', heat_pump: 'none', commercial_heat: 'none', smart_thermostat: 'none', battery: 'limited', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
+  { stage: 'Venture Equity', cost_pct: 'N/A (dilution)', techs: { water_heater: 'mature', hybrid_electrification: 'mature', heat_pump: 'mature', commercial_heat: 'mature', smart_thermostat: 'mature', battery_pro: 'mature', battery_diy: 'mature', battery_v2g: 'mature', solar_balcony_diy: 'mature', leak_thermal: 'mature', emissions_sensing: 'mature', aggregation: 'mature', ev: 'mature', smart_panel: 'mature' } },
+  { stage: 'Growth / Expansion', cost_pct: '15–25%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'mature', commercial_heat: 'emerging', smart_thermostat: 'mature', battery_pro: 'mature', battery_diy: 'limited', battery_v2g: 'emerging', solar_balcony_diy: 'emerging', leak_thermal: 'emerging', emissions_sensing: 'emerging', aggregation: 'mature', ev: 'mature', smart_panel: 'emerging' } },
+  { stage: 'Venture Debt', cost_pct: '12–18%', techs: { water_heater: 'emerging', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'limited', smart_thermostat: 'mature', battery_pro: 'mature', battery_diy: 'none', battery_v2g: 'limited', solar_balcony_diy: 'limited', leak_thermal: 'limited', emissions_sensing: 'limited', aggregation: 'emerging', ev: 'mature', smart_panel: 'limited' } },
+  { stage: 'Project Finance', cost_pct: '8–12%', techs: { water_heater: 'limited', hybrid_electrification: 'emerging', heat_pump: 'emerging', commercial_heat: 'none', smart_thermostat: 'limited', battery_pro: 'mature', battery_diy: 'none', battery_v2g: 'none', solar_balcony_diy: 'none', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'emerging', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'ABS / Securitization', cost_pct: '5–8%', techs: { water_heater: 'none', hybrid_electrification: 'limited', heat_pump: 'limited', commercial_heat: 'none', smart_thermostat: 'none', battery_pro: 'emerging', battery_diy: 'none', battery_v2g: 'none', solar_balcony_diy: 'none', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'none', ev: 'emerging', smart_panel: 'none' } },
+  { stage: 'Investment Grade', cost_pct: '4–6%', techs: { water_heater: 'none', hybrid_electrification: 'none', heat_pump: 'none', commercial_heat: 'none', smart_thermostat: 'none', battery_pro: 'limited', battery_diy: 'none', battery_v2g: 'none', solar_balcony_diy: 'none', leak_thermal: 'none', emissions_sensing: 'none', aggregation: 'none', ev: 'limited', smart_panel: 'none' } },
 ];
 
 const WILDCARDS = [
@@ -778,9 +922,9 @@ const WILDCARDS = [
     id: 'plug_in_revolution',
     title: 'The Plug-In Revolution',
     hook: 'Install friction collapses → adoption curves bend',
-    body: 'Germany passed 1.03M registered balcony solar systems by June 2025, doubling from 500k twelve months earlier and pushing past Spain\u2019s 1.5M. Zero safety incidents across the entire million-plus compliant base, per UL Solutions and peer-reviewed analysis. That track record is landing in US legislatures: Utah passed the first plug-in solar law in March 2025 (unanimous bipartisan); Virginia followed in March 2026 (96-0 Senate, 93-4 House); Colorado and Maryland are awaiting signatures; 28+ states have active legislation. Hardware following the same channel-collapse pattern: Gradient\u2019s 120V window heat pump installs in 30 minutes with no contractor / permit / HOA approval (NYCHA contracted 10,000 units). Ephoca, Chinese OEMs, and Mitsubishi following with plug-in HP form factors. EcoFlow PowerOcean, Anker SOLIX X1, Bluetti — modular plug-in batteries at retail. Focal already plug-and-play. Thalo Sidekick installs cellular without Wi-Fi. The pattern is consistent across categories.',
-    implication: 'Install friction has been the underappreciated rate-limiter on residential BTM. Installer-channel capacity, permit waits, electrician scheduling — not capex or value prop — caps adoption speed for most categories. When plug-and-play form factors arrive and policy allows them, curves bend sharply. Portfolio companies positioned to benefit most: Gradient (120V plug-in HP is the canonical case), Focal (already retail-ready), Plentify (retrofits existing, no new install), Thalo Sidekick (cellular install), Flair (DIY zoning). Categories that still need building-level integration — Kelvin\u2019s hybrid platform, smart panels, central HVAC — have less near-term lift from this force, but are positioned to benefit as adjacent self-install volume drives consumer familiarity with electrification. The timeline\u2019s self-install slider models this: drag it up and curves for high-potential techs accelerate.',
-    timeframe: 'EU already there. US 2025–2028 inflection. Channel structure rewrites by 2030.',
+    body: 'Germany has 1.1M registered plug-in solar systems as of November 2025 — and an estimated 3–4M actually installed once you account for the ~30–50% registration compliance rate. ~40% of new German buyers in 2025 also attached a portable battery (up from 20% in 2023), so the balcony-PV and DIY-battery curves are now converging on the same households. VDE published a dedicated plug-in PV standard (DIN VDE V 0126-95) in December 2025, formalizing what had been a grey-zone market. Zero safety incidents across the million-plus compliant base. That track record is landing in US legislatures: Utah passed the first plug-in solar law in March 2025; Virginia followed in March 2026 (96-0 Senate, 93-4 House); Colorado and Maryland are awaiting signatures; 28+ states have active legislation. Hardware following the same channel-collapse pattern across categories: Gradient\u2019s 120V window heat pump (NYCHA contracted 10,000 units); EcoFlow Delta Pro Ultra and Anker SOLIX retail batteries; Deye and Zendure all-in-one balcony PV + storage kits; Focal already plug-and-play; Thalo Sidekick cellular install. Worth noting: Germany Q1 2026 balcony solar installs declined 6% YoY — the early-adopter pool is saturating and the growth narrative is shifting from "more balcony PV" to "balcony PV + battery."',
+    implication: 'Install friction has been the underappreciated rate-limiter on residential BTM. The model now splits the categories most affected by self-install into distinct rows: battery_pro vs battery_diy vs battery_v2g (each with their own capex, install_friction, dispatchability, and capital channel), and solar_balcony_diy as a net-new row. The DIY rows have self_install_potential 5 and install_friction 1; the pro rows have self_install_potential 1 and install_friction 5. Drag the self-install slider and the DIY curves accelerate while pro curves barely move. Portfolio companies positioned to benefit most from this force: Gradient (120V plug-in HP is the canonical case), Focal (already retail-ready), Plentify (retrofits existing, no new install), Thalo Sidekick (cellular install), Flair (DIY zoning). Categories that still need building-level integration — Kelvin\u2019s hybrid platform, smart panels, central HVAC, battery_pro — have less near-term lift but benefit as adjacent self-install volume drives consumer familiarity with electrification. Battery_v2g is the wildcard: its trajectory depends as much on bidirectional charger rollout and tariff structure as on install friction; the v2g_enablement slider models that conversion ratio independently.',
+    timeframe: 'EU already there (Germany saturating). US 2025–2028 inflection. Channel structure rewrites by 2030.',
   },
 ];
 
@@ -793,11 +937,11 @@ const ROOFTOP_SOLAR_HISTORY = [
 ];
 
 const GEO_DEFAULTS = {
-  US: { regulatory: 60, capital_depth: 85, customer_trust: 65, peak_pressure: 60, resilience_demand: 60, electrification: 55, insurance: 55, self_install: 40 },
-  EU: { regulatory: 75, capital_depth: 70, customer_trust: 70, peak_pressure: 50, resilience_demand: 40, electrification: 75, insurance: 50, self_install: 70 },
-  LATAM: { regulatory: 35, capital_depth: 35, customer_trust: 40, peak_pressure: 65, resilience_demand: 80, electrification: 30, insurance: 25, self_install: 35 },
-  SA: { regulatory: 40, capital_depth: 30, customer_trust: 50, peak_pressure: 90, resilience_demand: 95, electrification: 25, insurance: 20, self_install: 30 },
-  IN: { regulatory: 45, capital_depth: 50, customer_trust: 45, peak_pressure: 80, resilience_demand: 75, electrification: 40, insurance: 30, self_install: 35 },
+  US: { regulatory: 60, capital_depth: 85, customer_trust: 65, peak_pressure: 60, resilience_demand: 60, electrification: 55, insurance: 55, self_install: 40, v2g_enablement: 15 },
+  EU: { regulatory: 75, capital_depth: 70, customer_trust: 70, peak_pressure: 50, resilience_demand: 40, electrification: 75, insurance: 50, self_install: 70, v2g_enablement: 30 },
+  LATAM: { regulatory: 35, capital_depth: 35, customer_trust: 40, peak_pressure: 65, resilience_demand: 80, electrification: 30, insurance: 25, self_install: 35, v2g_enablement: 5 },
+  SA: { regulatory: 40, capital_depth: 30, customer_trust: 50, peak_pressure: 90, resilience_demand: 95, electrification: 25, insurance: 20, self_install: 30, v2g_enablement: 5 },
+  IN: { regulatory: 45, capital_depth: 50, customer_trust: 45, peak_pressure: 80, resilience_demand: 75, electrification: 40, insurance: 30, self_install: 35, v2g_enablement: 8 },
 };
 
 // ============================================================================
@@ -974,6 +1118,7 @@ function TopBar({ geo, setGeo, horizon, setHorizon, sliders, setSliders, resetSl
       items: [
         { key: 'insurance', name: 'Insurance as buyer', help: 'Insurers paying for hardening / loss prevention' },
         { key: 'self_install', name: 'Self-install proliferation', help: 'Plug-and-play form factors collapsing install friction' },
+        { key: 'v2g_enablement', name: 'V2G enablement', help: 'Share of EV stock dispatchable as V2G — paced by bidirectional chargers + tariffs' },
       ],
     },
   ];
@@ -1286,11 +1431,14 @@ function AdoptionMap({ geo, horizon, sliders }) {
     .replace('Heat Pump (Full Electric)', 'Heat Pump')
     .replace('Commercial / Outdoor Electric Heat', 'Commercial Heat')
     .replace('Smart Thermostat / HVAC Controls', 'Thermostat')
-    .replace('Stationary Battery (Home/SMB)', 'Battery')
+    .replace('Battery — Whole-home (pro install)', 'Battery (pro)')
+    .replace('Battery — Portable / plug-in (DIY)', 'Battery (DIY)')
+    .replace('Battery — V2G (vehicle-to-grid)', 'Battery (V2G)')
+    .replace('Solar — Balcony / plug-in PV (DIY)', 'Balcony Solar')
     .replace('Leak / Cold-Chain / Asset Sensors', 'Leak Sensors')
     .replace('HVAC + Refrigerant Asset Intelligence', 'HVAC Intel')
     .replace('Aggregation / VPP Software', 'Aggregation')
-    .replace('EV / V2G / Managed Charging', 'EV / V2G')
+    .replace('EV / V2G / Managed Charging', 'EV')
     .replace('Smart Electrical Panel', 'Smart Panel');
 
   // Color by quadrant — brand-aligned
@@ -1424,6 +1572,7 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
   // friction and unlock retail channels, bending adoption curves upward.
   const techData = useMemo(() => {
     const siSlider = (sliders.self_install || 0) / 100;
+    const v2gSlider = (sliders.v2g_enablement || 0) / 100;
     return TECHNOLOGIES.map((t) => {
       const series = ADOPTION_TIMELINE[t.id];
       if (!series || !series[geo]) return null;
@@ -1433,11 +1582,19 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
       const boostFor = [0, 0, 0.3, 0.6];
       const adjusted = raw.map((p, i) => {
         const boost = 1 + siSlider * siPotential * boostFor[i];
-        return Math.min(100, p * boost);
+        let p2 = p * boost;
+        // V2G enablement gates battery_v2g specifically — the curve scales by the
+        // slider. At slider=0 there's a residual floor (vehicle backup exists even
+        // without grid-side enablement); at slider=100 the full modeled curve applies.
+        if (t.id === 'battery_v2g') {
+          const floor = 0.1; // baseline dispatch share even with no policy/charger support
+          p2 = p2 * (floor + (1 - floor) * v2gSlider);
+        }
+        return Math.min(100, p2);
       });
       return { tech: t, points: adjusted, raw, unit: series.unit };
     }).filter(Boolean);
-  }, [geo, sliders.self_install]);
+  }, [geo, sliders.self_install, sliders.v2g_enablement]);
 
   const W = 800;
   const H = 460;
@@ -1460,11 +1617,14 @@ function AdoptionTimeline({ geo, horizon, sliders }) {
     .replace('Heat Pump (Full Electric)', 'Heat Pump')
     .replace('Commercial / Outdoor Electric Heat', 'Commercial Heat')
     .replace('Smart Thermostat / HVAC Controls', 'Thermostat')
-    .replace('Stationary Battery (Home/SMB)', 'Battery')
+    .replace('Battery — Whole-home (pro install)', 'Battery (pro)')
+    .replace('Battery — Portable / plug-in (DIY)', 'Battery (DIY)')
+    .replace('Battery — V2G (vehicle-to-grid)', 'Battery (V2G)')
+    .replace('Solar — Balcony / plug-in PV (DIY)', 'Balcony Solar')
     .replace('Leak / Cold-Chain / Asset Sensors', 'Leak Sensors')
     .replace('HVAC + Refrigerant Asset Intelligence', 'HVAC Intel')
     .replace('Aggregation / VPP Software', 'Aggregation')
-    .replace('EV / V2G / Managed Charging', 'EV / V2G')
+    .replace('EV / V2G / Managed Charging', 'EV')
     .replace('Smart Electrical Panel', 'Smart Panel');
 
   // Build path string for each tech
