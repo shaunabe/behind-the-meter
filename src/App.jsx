@@ -1192,6 +1192,7 @@ function TopBar({ geo, setGeo, horizon, setHorizon, sliders, setSliders, resetSl
                       min="0"
                       max="100"
                       value={sliders[s.key]}
+                      style={{ '--val': `${sliders[s.key]}%` }}
                       onChange={(e) => setSliders({ ...sliders, [s.key]: +e.target.value })}
                     />
                     {isOpen && ref && (
@@ -2263,8 +2264,15 @@ const CSS = `
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 2px;
-  background: var(--rule);
+  height: 6px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--val, 50%),
+    #d9d9d9 var(--val, 50%),
+    #d9d9d9 100%
+  );
+  border-radius: 3px;
   outline: none;
   cursor: pointer;
 }
@@ -2272,21 +2280,33 @@ const CSS = `
 .slider-item input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
-  background: var(--ink);
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
   border: 2px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--accent), 0 1px 3px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  box-shadow: 0 0 0 1px var(--ink);
+  transition: transform 0.1s ease;
+}
+
+.slider-item input[type='range']::-webkit-slider-thumb:hover,
+.slider-item input[type='range']:focus::-webkit-slider-thumb {
+  transform: scale(1.15);
 }
 
 .slider-item input[type='range']::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  background: var(--ink);
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
   border: 2px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--accent), 0 1px 3px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  box-shadow: 0 0 0 1px var(--ink);
+  transition: transform 0.1s ease;
+}
+
+.slider-item input[type='range']::-moz-range-thumb:hover,
+.slider-item input[type='range']:focus::-moz-range-thumb {
+  transform: scale(1.15);
 }
 
 .slider-info-btn {
